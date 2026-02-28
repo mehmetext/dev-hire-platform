@@ -1,10 +1,11 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { LoginResult } from '../dtos/login.result';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
 
+@Injectable()
 export class LoginUseCase {
   constructor(
     @Inject(TokenGeneratorRepository)

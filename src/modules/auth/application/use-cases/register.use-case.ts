@@ -1,9 +1,10 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserCommand } from 'src/modules/user/application/dtos/create-user.command';
 import { CreateUserUseCase } from 'src/modules/user/application/use-cases/create-user.use-case';
 import { LoginResult } from '../dtos/login.result';
 import { LoginUseCase } from './login.use-case';
 
+@Injectable()
 export class RegisterUseCase {
   constructor(
     @Inject(CreateUserUseCase)
