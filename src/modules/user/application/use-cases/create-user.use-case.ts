@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { CandidateRepository } from 'src/modules/candidate/application/repositories/candidate.repository';
+import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyRepository } from 'src/modules/company/application/repositories/company.repository';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entitiy';
 import { SubscriptionPlan } from 'src/modules/company/domain/enums/subscription-plan.enum';
@@ -15,6 +17,8 @@ export class CreateUserUseCase {
     private readonly unitOfWorkRepository: UnitOfWorkRepository,
     @Inject(CompanyRepository)
     private readonly companyRepository: CompanyRepository,
+    @Inject(CandidateRepository)
+    private readonly candidateRepository: CandidateRepository,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<User> {
@@ -23,8 +27,11 @@ export class CreateUserUseCase {
         tx,
       });
 
+      let companyProfile: CompanyProfile | undefined;
+      let candidateProfile: CandidateProfile | undefined;
+
       if (command.companyProfile) {
-        await this.companyRepository.create(
+        companyProfile = await this.companyRepository.create(
           CompanyProfile.create({
             name: command.companyProfile.name,
             logoUrl: command.companyProfile.logoUrl,
@@ -35,13 +42,24 @@ export class CreateUserUseCase {
         );
       }
 
-      /* if (command.candidateProfile) {
-        await this.candidateRepository.create(command.candidateProfile, {
-          tx,
-        });
-      } */
+      if (command.candidateProfile) {
+        candidateProfile = await this.candidateRepository.create(
+          CandidateProfile.create({
+            firstName: command.candidateProfile.firstName,
+            lastName: command.candidateProfile.lastName,
+            userId: user.id,
+          }),
+          { tx },
+        );
+      }
 
-      return user;
+      return User.create({
+        email: user.email,
+        password: user.password,
+        role: user.role,
+        companyProfile: companyProfile,
+        candidateProfile: candidateProfile,
+      });
     });
   }
 }

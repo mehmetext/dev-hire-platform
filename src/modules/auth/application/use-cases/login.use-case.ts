@@ -50,6 +50,8 @@ export class LoginUseCase {
         id: user.id,
         email: user.email.value,
         role: user.role,
+        companyProfile: user.companyProfile,
+        candidateProfile: user.candidateProfile,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         deletedAt: user.deletedAt,
