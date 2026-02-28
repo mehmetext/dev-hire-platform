@@ -22,6 +22,9 @@ export class CompanyProfile {
     logoUrl: string | undefined;
     userId: string;
     subscriptionPlan: SubscriptionPlan;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date | undefined;
   }): CompanyProfile {
     return new CompanyProfile(
       randomUUID(),
@@ -29,9 +32,9 @@ export class CompanyProfile {
       params.logoUrl,
       params.userId,
       params.subscriptionPlan,
-      new Date(),
-      new Date(),
-      undefined,
+      params.createdAt ?? new Date(),
+      params.updatedAt ?? new Date(),
+      params.deletedAt ?? undefined,
     );
   }
 }

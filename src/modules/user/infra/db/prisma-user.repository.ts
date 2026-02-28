@@ -35,25 +35,44 @@ export class PrismaUserRepository implements UserRepository {
       },
     });
 
-    return PrismaUserMapper.toDomain(created);
+    return PrismaUserMapper.toDomain({
+      ...created,
+    });
   }
 
   async findByEmail(email: EmailVO): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.value },
+      include: {
+        companyProfile: true,
+        candidateProfile: true,
+      },
     });
+
     if (!user) return null;
 
-    return PrismaUserMapper.toDomain(user);
+    return PrismaUserMapper.toDomain({
+      ...user,
+      companyProfile: user.companyProfile ?? undefined,
+      candidateProfile: user.candidateProfile ?? undefined,
+    });
   }
 
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        companyProfile: true,
+        candidateProfile: true,
+      },
     });
     if (!user) return null;
 
-    return PrismaUserMapper.toDomain(user);
+    return PrismaUserMapper.toDomain({
+      ...user,
+      companyProfile: user.companyProfile ?? undefined,
+      candidateProfile: user.candidateProfile ?? undefined,
+    });
   }
 
   async update(user: User): Promise<User> {
@@ -69,9 +88,17 @@ export class PrismaUserRepository implements UserRepository {
         email: user.email.value,
         password: user.password,
       },
+      include: {
+        companyProfile: true,
+        candidateProfile: true,
+      },
     });
 
-    return PrismaUserMapper.toDomain(updated);
+    return PrismaUserMapper.toDomain({
+      ...updated,
+      companyProfile: updated.companyProfile ?? undefined,
+      candidateProfile: updated.candidateProfile ?? undefined,
+    });
   }
 
   async delete(id: string): Promise<void> {

@@ -19,15 +19,18 @@ export class CandidateProfile {
     firstName: string;
     lastName: string;
     userId: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date | undefined;
   }): CandidateProfile {
     return new CandidateProfile(
       randomUUID(),
       params.firstName,
       params.lastName,
       params.userId,
-      new Date(),
-      new Date(),
-      undefined,
+      params.createdAt ?? new Date(),
+      params.updatedAt ?? new Date(),
+      params.deletedAt ?? undefined,
     );
   }
 }
