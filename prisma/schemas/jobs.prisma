@@ -18,6 +18,8 @@ model Job {
 
   title           String           @map("title")
   description     String           @map("description")
+  requirements    String[]         @map("requirements")
+  location        String           @map("location")
   workType        WorkType         @map("work_type")
   status          JobStatus        @map("status")
   expiresAt       DateTime?        @map("expires_at")
