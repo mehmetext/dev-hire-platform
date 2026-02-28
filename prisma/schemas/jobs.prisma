@@ -46,6 +46,8 @@ model JobApplication {
 
   candidateProfileId String
   candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  candidateCVId      String
+  candidateCV        CandidateCV      @relation(fields: [candidateCVId], references: [id])
 
   status JobApplicationStatus @map("status")
 

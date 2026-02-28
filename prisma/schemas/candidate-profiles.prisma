@@ -21,6 +21,7 @@ model CandidateCV {
 
   candidateProfileId String           @unique @map("candidate_profile_id")
   candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+  jobApplications    JobApplication[]
 
   title String? @map("title")
   url   String  @map("url")
