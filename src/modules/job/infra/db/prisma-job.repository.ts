@@ -31,6 +31,16 @@ export class PrismaJobRepository implements JobRepository {
     );
   }
 
+  async findAllByCompanyId(companyId: string): Promise<Job[]> {
+    const jobs = await this.prisma.job.findMany({
+      where: {
+        companyProfileId: companyId,
+        deletedAt: null,
+      },
+    });
+    return jobs.map((job) => PrismaJobMapper.toDomain(job));
+  }
+
   async create(command: CreateJobCommand): Promise<Job> {
     const job = Job.create({
       id: randomUUID(),

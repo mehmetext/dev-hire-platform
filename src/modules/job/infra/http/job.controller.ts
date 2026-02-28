@@ -11,13 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, OmitType } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
+import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
 import { CreateJobDto } from '../dtos/create-job.dto';
@@ -35,6 +36,8 @@ export class JobController {
     private readonly getJobsUseCase: GetJobsUseCase,
     @Inject(UpdateJobUseCase)
     private readonly updateJobUseCase: UpdateJobUseCase,
+    @Inject(GetJobsByCompanyIdUseCase)
+    private readonly getJobsByCompanyIdUseCase: GetJobsByCompanyIdUseCase,
   ) {}
 
   @Post()
@@ -67,6 +70,14 @@ export class JobController {
   @ApiOkResponseGeneric(JobResponseDto, { isArray: true })
   getJobs() {
     return this.getJobsUseCase.execute();
+  }
+
+  @Get('company/:companyId')
+  @ApiOkResponseGeneric(OmitType(JobResponseDto, ['companyProfile']), {
+    isArray: true,
+  })
+  getJobsByCompanyId(@Param('companyId') companyId: string) {
+    return this.getJobsByCompanyIdUseCase.execute(companyId);
   }
 
   @Put(':id')
