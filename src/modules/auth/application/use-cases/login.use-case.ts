@@ -49,6 +49,7 @@ export class LoginUseCase {
       user: {
         id: user.id,
         email: user.email.value,
+        role: user.role,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         deletedAt: user.deletedAt,

@@ -8,6 +8,7 @@ export class PrismaUserMapper {
       user.id,
       new EmailVO(user.email),
       user.password,
+      user.role,
       user.createdAt,
       user.updatedAt,
       user.deletedAt ?? undefined,
