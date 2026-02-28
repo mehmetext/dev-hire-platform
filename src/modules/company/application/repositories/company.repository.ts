@@ -1,5 +1,5 @@
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
-import { CompanyProfile } from '../../domain/entities/company-profile.entitiy';
+import { CompanyProfile } from '../../domain/entities/company-profile.entity';
 
 export abstract class CompanyRepository {
   abstract create(

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
-import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entitiy';
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { UserRole } from '../enums/user-role.enum';
 import { EmailVO } from '../value-objects/email.vo';
 

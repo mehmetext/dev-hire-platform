@@ -4,7 +4,7 @@ import {
   User as PrismaUser,
 } from 'src/generated/prisma/client';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
-import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entitiy';
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { User } from '../../domain/entities/user.entity';
 import { EmailVO } from '../../domain/value-objects/email.vo';
 

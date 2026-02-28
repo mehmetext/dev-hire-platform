@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CandidateRepository } from 'src/modules/candidate/application/repositories/candidate.repository';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyRepository } from 'src/modules/company/application/repositories/company.repository';
-import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entitiy';
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { SubscriptionPlan } from 'src/modules/company/domain/enums/subscription-plan.enum';
 import { UnitOfWorkRepository } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { User } from '../../domain/entities/user.entity';

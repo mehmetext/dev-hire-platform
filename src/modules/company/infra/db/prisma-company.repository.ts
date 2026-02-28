@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { CompanyRepository } from '../../application/repositories/company.repository';
-import { CompanyProfile } from '../../domain/entities/company-profile.entitiy';
+import { CompanyProfile } from '../../domain/entities/company-profile.entity';
 import { PrismaCompanyMapper } from './prisma-company.mapper';
 
 @Injectable()

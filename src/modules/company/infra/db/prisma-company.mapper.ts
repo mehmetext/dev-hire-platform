@@ -2,7 +2,7 @@ import {
   Prisma,
   CompanyProfile as PrismaCompanyProfile,
 } from 'src/generated/prisma/client';
-import { CompanyProfile } from '../../domain/entities/company-profile.entitiy';
+import { CompanyProfile } from '../../domain/entities/company-profile.entity';
 
 export class PrismaCompanyMapper {
   static toDomain(companyProfile: PrismaCompanyProfile): CompanyProfile {
