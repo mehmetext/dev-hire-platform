@@ -2,7 +2,8 @@ import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import Keyv from 'keyv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -29,6 +30,25 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'short',
+          ttl: 1000,
+          limit: 3,
+        },
+        {
+          name: 'medium',
+          ttl: 10000,
+          limit: 20,
+        },
+        {
+          name: 'long',
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
+    }),
     AuthModule,
   ],
   controllers: [AppController],
@@ -37,6 +57,10 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
