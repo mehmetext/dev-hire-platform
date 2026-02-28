@@ -87,6 +87,7 @@ export class AuthController {
     return {
       id: req.user.id,
       email: req.user.email,
+      role: req.user.role,
       createdAt: req.user.createdAt,
       updatedAt: req.user.updatedAt,
     };
