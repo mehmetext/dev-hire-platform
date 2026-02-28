@@ -5,6 +5,7 @@ import {
   Inject,
   Param,
   Post,
+  Put,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -18,8 +19,10 @@ import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-gene
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
+import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
+import { UpdateJobDto } from '../dtos/update-job.dto';
 
 @Controller('jobs')
 export class JobController {
@@ -30,6 +33,8 @@ export class JobController {
     private readonly getJobByIdUseCase: GetJobByIdUseCase,
     @Inject(GetJobsUseCase)
     private readonly getJobsUseCase: GetJobsUseCase,
+    @Inject(UpdateJobUseCase)
+    private readonly updateJobUseCase: UpdateJobUseCase,
   ) {}
 
   @Post()
@@ -62,5 +67,25 @@ export class JobController {
   @ApiOkResponseGeneric(JobResponseDto, { isArray: true })
   getJobs() {
     return this.getJobsUseCase.execute();
+  }
+
+  @Put(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOkResponseGeneric(JobResponseDto)
+  updateJob(
+    @Param('id') id: string,
+    @Body() updateJobDto: UpdateJobDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.companyProfile?.id) {
+      throw new UnauthorizedException('Company profile not found');
+    }
+
+    return this.updateJobUseCase.execute({
+      id,
+      companyProfileId: req.user.companyProfile.id,
+      ...updateJobDto,
+    });
   }
 }

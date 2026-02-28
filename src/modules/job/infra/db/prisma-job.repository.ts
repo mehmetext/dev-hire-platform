@@ -61,13 +61,19 @@ export class PrismaJobRepository implements JobRepository {
   }
   async update(command: UpdateJobCommand): Promise<Job> {
     const job = await this.findById(command.id);
+
     if (!job) {
       throw new JobNotFoundError();
     }
 
+    const updatedJob = Job.create({
+      ...job,
+      ...command,
+    });
+
     const updated = await this.prisma.job.update({
       where: { id: command.id },
-      data: PrismaJobMapper.toUpdatePersistence(job),
+      data: PrismaJobMapper.toUpdatePersistence(updatedJob),
     });
     return PrismaJobMapper.toDomain(updated);
   }

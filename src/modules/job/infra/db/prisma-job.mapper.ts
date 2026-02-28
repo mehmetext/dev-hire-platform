@@ -52,9 +52,6 @@ export class PrismaJobMapper {
   }
 
   static toUpdatePersistence(job: Job): Prisma.JobUncheckedUpdateInput {
-    return {
-      ...PrismaJobMapper.toCreatePersistence(job),
-      deletedAt: job.deletedAt ?? undefined,
-    };
+    return PrismaJobMapper.toCreatePersistence(job);
   }
 }

@@ -6,3 +6,9 @@ export class JobNotFoundError extends DomainError {
     super(message, StatusCode.NOT_FOUND);
   }
 }
+
+export class JobNotAllowedError extends DomainError {
+  constructor(message = 'You are not allowed to update this job') {
+    super(message, StatusCode.FORBIDDEN);
+  }
+}
