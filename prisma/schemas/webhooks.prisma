@@ -8,6 +8,31 @@ model Webhook {
   deletedAt DateTime? @map("deleted_at")
 
   companyWebhooks CompanyWebhook[]
+  deliveries      WebhookDelivery[]
 
   @@map("webhooks")
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+model WebhookDelivery {
+  id           String                @id @default(uuid())
+  payload      Json                  @map("payload")
+  status       WebhookDeliveryStatus @map("status")
+  attemptCount Int                   @default(0) @map("attempt_count")
+  nextRetryAt  DateTime?             @map("next_retry_at")
+
+  webhookId String
+  webhook   Webhook @relation(fields: [webhookId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("webhook_deliveries")
 }
