@@ -1,12 +1,38 @@
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
 model CompanyProfile {
   id String @id @default(uuid())
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  companyName      String           @map("company_name")
+  logoUrl          String           @map("logo_url")
+  subscriptionPlan SubscriptionPlan @map("subscription_plan")
+  webhooks         CompanyWebhook[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("company_profiles")
+}
+
+model CompanyWebhook {
+  companyProfileId String
+  companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id])
+
+  webhookId String
+  webhook   Webhook @relation(fields: [webhookId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([companyProfileId, webhookId])
+  @@map("company_webhooks")
 }
