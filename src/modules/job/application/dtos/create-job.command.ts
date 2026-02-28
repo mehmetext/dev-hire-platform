@@ -3,7 +3,6 @@ import { JobStatus } from '../../domain/enums/job-status.enum';
 
 export class CreateJobCommand {
   constructor(
-    public readonly companyProfileId: string,
     public readonly title: string,
     public readonly description: string,
     public readonly requirements: string[],
@@ -11,5 +10,6 @@ export class CreateJobCommand {
     public readonly workType: WorkType,
     public readonly status: JobStatus,
     public readonly expiresAt: Date | undefined,
+    public readonly companyProfileId: string,
   ) {}
 }

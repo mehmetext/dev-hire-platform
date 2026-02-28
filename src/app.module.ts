@@ -8,6 +8,7 @@ import Keyv from 'keyv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/infra/auth.module';
+import { JobModule } from './modules/job/infra/job.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { PrismaModule } from './shared/modules/prisma/prisma.module';
 
@@ -50,6 +51,7 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
       ],
     }),
     AuthModule,
+    JobModule,
   ],
   controllers: [AppController],
   providers: [

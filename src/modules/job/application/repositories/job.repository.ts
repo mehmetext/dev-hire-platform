@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { Job } from '../../domain/entities/job.entity';
 import { CreateJobCommand } from '../dtos/create-job.command';
 import { UpdateJobCommand } from '../dtos/update-job.command';
 
+@Injectable()
 export abstract class JobRepository {
   abstract create(command: CreateJobCommand): Promise<Job>;
   abstract findById(id: string): Promise<Job | null>;

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { CandidateRepository } from 'src/modules/candidate/application/repositories/candidate.repository';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyRepository } from 'src/modules/company/application/repositories/company.repository';
@@ -33,6 +34,7 @@ export class CreateUserUseCase {
       if (command.companyProfile) {
         companyProfile = await this.companyRepository.create(
           CompanyProfile.create({
+            id: randomUUID(),
             name: command.companyProfile.name,
             logoUrl: command.companyProfile.logoUrl,
             userId: user.id,
@@ -45,6 +47,7 @@ export class CreateUserUseCase {
       if (command.candidateProfile) {
         candidateProfile = await this.candidateRepository.create(
           CandidateProfile.create({
+            id: randomUUID(),
             firstName: command.candidateProfile.firstName,
             lastName: command.candidateProfile.lastName,
             userId: user.id,

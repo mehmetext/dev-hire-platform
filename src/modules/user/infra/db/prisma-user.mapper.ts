@@ -25,6 +25,7 @@ export class PrismaUserMapper {
       user.deletedAt ?? undefined,
       user.companyProfile
         ? CompanyProfile.create({
+            id: user.companyProfile.id,
             name: user.companyProfile.name,
             logoUrl: user.companyProfile.logoUrl ?? undefined,
             userId: user.companyProfile.userId,
@@ -36,6 +37,7 @@ export class PrismaUserMapper {
         : undefined,
       user.candidateProfile
         ? CandidateProfile.create({
+            id: user.candidateProfile.id,
             firstName: user.candidateProfile.firstName,
             lastName: user.candidateProfile.lastName,
             userId: user.candidateProfile.userId,

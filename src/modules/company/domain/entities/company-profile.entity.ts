@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { SubscriptionPlan } from '../enums/subscription-plan.enum';
 
 export class CompanyProfile {
@@ -18,6 +17,7 @@ export class CompanyProfile {
   }
 
   static create(params: {
+    id: string;
     name: string;
     logoUrl: string | undefined;
     userId: string;
@@ -27,7 +27,7 @@ export class CompanyProfile {
     deletedAt?: Date | undefined;
   }): CompanyProfile {
     return new CompanyProfile(
-      randomUUID(),
+      params.id,
       params.name,
       params.logoUrl,
       params.userId,

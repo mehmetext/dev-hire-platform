@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 export class CandidateProfile {
   constructor(
     public readonly id: string,
@@ -16,6 +14,7 @@ export class CandidateProfile {
   }
 
   static create(params: {
+    id: string;
     firstName: string;
     lastName: string;
     userId: string;
@@ -24,7 +23,7 @@ export class CandidateProfile {
     deletedAt?: Date | undefined;
   }): CandidateProfile {
     return new CandidateProfile(
-      randomUUID(),
+      params.id,
       params.firstName,
       params.lastName,
       params.userId,
