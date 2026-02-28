@@ -5,6 +5,7 @@ import { CreateJobCommand } from '../../application/dtos/create-job.command';
 import { UpdateJobCommand } from '../../application/dtos/update-job.command';
 import { JobRepository } from '../../application/repositories/job.repository';
 import { Job } from '../../domain/entities/job.entity';
+import { JobStatus } from '../../domain/enums/job-status.enum';
 import { JobNotFoundError } from '../../domain/errors';
 import { PrismaJobMapper } from './prisma-job.mapper';
 
@@ -19,6 +20,7 @@ export class PrismaJobRepository implements JobRepository {
       },
       where: {
         deletedAt: null,
+        status: JobStatus.ACTIVE,
       },
     });
     return jobs.map((job) =>
