@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
+import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { CreateUserCommand } from '../../application/dtos/create-user.command';
 import { User } from '../../domain/entities/user.entity';
 import { UserNotFoundError } from '../../domain/errors';
@@ -12,7 +13,12 @@ import { PrismaUserMapper } from './prisma-user.mapper';
 export class PrismaUserRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(command: CreateUserCommand): Promise<User> {
+  async create(
+    command: CreateUserCommand,
+    options?: { tx?: TransactionContext },
+  ): Promise<User> {
+    const client = (options?.tx ?? this.prisma) as PrismaService;
+
     const existingUser = await this.findByEmail(command.email);
 
     if (existingUser) {
@@ -21,7 +27,7 @@ export class PrismaUserRepository implements UserRepository {
 
     const hashedPassword = await bcrypt.hash(command.password, 10);
 
-    const created = await this.prisma.user.create({
+    const created = await client.user.create({
       data: {
         email: command.email.value,
         password: hashedPassword,
