@@ -26,6 +26,7 @@ import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-cas
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
+import { JobsLimitGuard } from '../guards/jobs-limit.guard';
 
 @Controller('jobs')
 export class JobController {
@@ -46,7 +47,7 @@ export class JobController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), JobsLimitGuard)
   @ApiCreatedResponseGeneric(JobResponseDto)
   async createJob(
     @Body() createJobDto: CreateJobDto,

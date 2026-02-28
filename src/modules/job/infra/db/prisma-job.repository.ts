@@ -103,4 +103,10 @@ export class PrismaJobRepository implements JobRepository {
       data: { deletedAt: new Date() },
     });
   }
+
+  async countByCompanyId(companyId: string): Promise<number> {
+    return this.prisma.job.count({
+      where: { companyProfileId: companyId, deletedAt: null },
+    });
+  }
 }

@@ -11,4 +11,5 @@ export abstract class JobRepository {
   abstract findAllByCompanyId(companyId: string): Promise<Job[]>;
   abstract update(command: UpdateJobCommand): Promise<Job>;
   abstract delete(id: string): Promise<void>;
+  abstract countByCompanyId(companyId: string): Promise<number>;
 }
