@@ -21,6 +21,9 @@ export class PrismaJobRepository implements JobRepository {
       where: {
         deletedAt: null,
         status: JobStatus.ACTIVE,
+        expiresAt: {
+          gt: new Date(),
+        },
       },
     });
     return jobs.map((job) =>

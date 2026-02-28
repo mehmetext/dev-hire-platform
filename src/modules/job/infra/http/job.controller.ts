@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -11,12 +12,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, OmitType } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, OmitType } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
+import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
@@ -38,6 +40,8 @@ export class JobController {
     private readonly updateJobUseCase: UpdateJobUseCase,
     @Inject(GetJobsByCompanyIdUseCase)
     private readonly getJobsByCompanyIdUseCase: GetJobsByCompanyIdUseCase,
+    @Inject(DeleteJobUseCase)
+    private readonly deleteJobUseCase: DeleteJobUseCase,
   ) {}
 
   @Post()
@@ -98,5 +102,19 @@ export class JobController {
       companyProfileId: req.user.companyProfile.id,
       ...updateJobDto,
     });
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiNoContentResponse()
+  deleteJob(
+    @Param('id') id: string,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.companyProfile?.id) {
+      throw new UnauthorizedException('Company profile not found');
+    }
+    return this.deleteJobUseCase.execute(id, req.user.companyProfile.id);
   }
 }
