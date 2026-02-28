@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { UserRole } from '../enums/user-role.enum';
@@ -22,6 +21,7 @@ export class User {
   }
 
   static create(params: {
+    id: string;
     email: EmailVO;
     password: string;
     role: UserRole;
@@ -29,7 +29,7 @@ export class User {
     candidateProfile?: CandidateProfile;
   }): User {
     return new User(
-      randomUUID(),
+      params.id,
       params.email,
       params.password,
       params.role,
