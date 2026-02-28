@@ -27,15 +27,18 @@ export class User {
     role: UserRole;
     companyProfile?: CompanyProfile;
     candidateProfile?: CandidateProfile;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date | undefined;
   }): User {
     return new User(
       params.id,
       params.email,
       params.password,
       params.role,
-      new Date(),
-      new Date(),
-      undefined,
+      params.createdAt ?? new Date(),
+      params.updatedAt ?? new Date(),
+      params.deletedAt,
       params.companyProfile,
       params.candidateProfile,
     );

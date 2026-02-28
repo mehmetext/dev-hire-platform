@@ -60,6 +60,9 @@ export class CreateUserUseCase {
         role: user.role,
         companyProfile: companyProfile,
         candidateProfile: candidateProfile,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        deletedAt: user.deletedAt,
       });
     });
   }
