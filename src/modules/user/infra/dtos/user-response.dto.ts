@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CandidateResponseDto } from 'src/modules/candidate/infra/dtos/candidate-response.dto';
+import { CompanyResponseDto } from 'src/modules/company/infra/dtos/company-response.dto';
 import { UserRole } from '../../domain/enums/user-role.enum';
 
 export class UserResponseDto {
@@ -38,4 +40,16 @@ export class UserResponseDto {
     nullable: true,
   })
   deletedAt?: Date | null;
+
+  @ApiProperty({
+    description: 'The company profile of the user',
+    example: CompanyResponseDto,
+  })
+  companyProfile?: CompanyResponseDto;
+
+  @ApiProperty({
+    description: 'The candidate profile of the user',
+    example: CandidateResponseDto,
+  })
+  candidateProfile?: CandidateResponseDto;
 }

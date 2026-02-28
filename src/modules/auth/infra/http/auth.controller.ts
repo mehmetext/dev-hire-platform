@@ -88,6 +88,8 @@ export class AuthController {
       id: req.user.id,
       email: req.user.email,
       role: req.user.role,
+      companyProfile: req.user.companyProfile,
+      candidateProfile: req.user.candidateProfile,
       createdAt: req.user.createdAt,
       updatedAt: req.user.updatedAt,
     };
