@@ -1,0 +1,56 @@
+enum WorkType {
+  REMOTE
+  HYBRID
+  ONSITE
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+model Job {
+  id String @id @default(uuid())
+
+  companyProfileId String
+  companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id])
+
+  title           String           @map("title")
+  description     String           @map("description")
+  workType        WorkType         @map("work_type")
+  status          JobStatus        @map("status")
+  expiresAt       DateTime?        @map("expires_at")
+  jobApplications JobApplication[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("jobs")
+}
+
+enum JobApplicationStatus {
+  PENDING
+  REVIEWING
+  INTERVIEWING
+  OFFER_MADE
+  HIRED
+}
+
+model JobApplication {
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id])
+
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+
+  status JobApplicationStatus @map("status")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([jobId, candidateProfileId])
+  @@map("job_applications")
+}

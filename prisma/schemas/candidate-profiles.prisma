@@ -4,8 +4,9 @@ model CandidateProfile {
   userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
 
-  firstName String @map("first_name")
-  lastName  String @map("last_name")
+  firstName       String           @map("first_name")
+  lastName        String           @map("last_name")
+  jobApplications JobApplication[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
