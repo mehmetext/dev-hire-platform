@@ -25,6 +25,7 @@ export class PrismaUserRepository implements UserRepository {
       data: {
         email: command.email.value,
         password: hashedPassword,
+        role: command.role,
       },
     });
 

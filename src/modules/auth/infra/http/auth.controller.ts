@@ -12,6 +12,7 @@ import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { CreateUserCommand } from 'src/modules/user/application/dtos/create-user.command';
 import { User } from 'src/modules/user/domain/entities/user.entity';
+import { UserRole } from 'src/modules/user/domain/enums/user-role.enum';
 import { EmailVO } from 'src/modules/user/domain/value-objects/email.vo';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
@@ -48,6 +49,7 @@ export class AuthController {
     const createUserCommand = new CreateUserCommand(
       new EmailVO(body.email),
       body.password,
+      UserRole.CANDIDATE,
     );
 
     return this.registerUseCase.execute(createUserCommand);
