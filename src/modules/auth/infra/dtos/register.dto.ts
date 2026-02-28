@@ -45,6 +45,11 @@ export class RegisterCandidateProfileDto {
   lastName: string;
 }
 
+export enum RegisterRole {
+  CANDIDATE = 'CANDIDATE',
+  COMPANY = 'COMPANY',
+}
+
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
@@ -63,11 +68,11 @@ export class RegisterDto {
   })
   password: string;
 
-  @IsEnum(UserRole)
+  @IsEnum(RegisterRole)
   @IsNotEmpty()
   @ApiProperty({
     description: 'The role of the user',
-    enum: UserRole,
+    enum: RegisterRole,
   })
   role: UserRole;
 

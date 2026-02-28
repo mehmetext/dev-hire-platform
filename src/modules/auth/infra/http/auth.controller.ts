@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -46,10 +47,31 @@ export class AuthController {
   @ApiBody({ type: RegisterDto })
   @ApiCreatedResponseGeneric(LoginResponseDto)
   async register(@Body() body: RegisterDto): Promise<LoginResponseDto> {
+    const { role, companyProfile, candidateProfile } = body;
+
+    if (
+      (role === UserRole.COMPANY && !companyProfile) ||
+      (role === UserRole.CANDIDATE && !candidateProfile)
+    ) {
+      throw new BadRequestException(
+        role === UserRole.COMPANY
+          ? 'Company profile is required when registering as a company'
+          : 'Candidate profile is required when registering as a candidate',
+      );
+    }
+
+    if (candidateProfile && companyProfile) {
+      throw new BadRequestException(
+        'Candidate and company profiles cannot be provided at the same time',
+      );
+    }
+
     const createUserCommand = new CreateUserCommand(
       new EmailVO(body.email),
       body.password,
-      UserRole.CANDIDATE,
+      body.role,
+      body.companyProfile,
+      body.candidateProfile,
     );
 
     return this.registerUseCase.execute(createUserCommand);
