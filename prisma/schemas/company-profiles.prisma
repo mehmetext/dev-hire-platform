@@ -10,8 +10,8 @@ model CompanyProfile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  companyName      String           @map("company_name")
-  logoUrl          String           @map("logo_url")
+  name             String           @map("name")
+  logoUrl          String?          @map("logo_url")
   subscriptionPlan SubscriptionPlan @map("subscription_plan")
   webhooks         CompanyWebhook[]
   jobs             Job[]

@@ -1,10 +1,49 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
+import { UserRole } from 'src/modules/user/domain/enums/user-role.enum';
+
+export class RegisterCompanyProfileDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The name of the company',
+    example: 'Company Name',
+  })
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The logo URL of the company',
+    example: 'https://example.com/logo.png',
+  })
+  logoUrl?: string;
+}
+
+export class RegisterCandidateProfileDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The first name of the candidate',
+    example: 'John',
+  })
+  firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The last name of the candidate',
+    example: 'Doe',
+  })
+  lastName: string;
+}
 
 export class RegisterDto {
   @IsString()
@@ -23,4 +62,26 @@ export class RegisterDto {
     example: 'Password@123',
   })
   password: string;
+
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The role of the user',
+    enum: UserRole,
+  })
+  role: UserRole;
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The company profile of the user',
+    type: RegisterCompanyProfileDto,
+  })
+  companyProfile?: RegisterCompanyProfileDto;
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The candidate profile of the user',
+    type: RegisterCandidateProfileDto,
+  })
+  candidateProfile?: RegisterCandidateProfileDto;
 }

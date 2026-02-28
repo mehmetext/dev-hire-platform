@@ -7,10 +7,27 @@ model CandidateProfile {
   firstName       String           @map("first_name")
   lastName        String           @map("last_name")
   jobApplications JobApplication[]
+  cvs             CandidateCV[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   @@map("candidate_profiles")
+}
+
+model CandidateCV {
+  id String @id @default(uuid())
+
+  candidateProfileId String           @unique @map("candidate_profile_id")
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
+
+  title String? @map("title")
+  url   String  @map("url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("candidate_cvs")
 }
