@@ -3,9 +3,9 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { CreateUserCommand } from '../../application/dtos/create-user.command';
+import { UserRepository } from '../../application/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
 import { UserNotFoundError } from '../../domain/errors';
-import { UserRepository } from '../../domain/repositories/user.repository';
 import { EmailVO } from '../../domain/value-objects/email.vo';
 import { PrismaUserMapper } from './prisma-user.mapper';
 

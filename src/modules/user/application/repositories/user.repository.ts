@@ -1,7 +1,7 @@
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
-import { CreateUserCommand } from '../../application/dtos/create-user.command';
-import { User } from '../entities/user.entity';
-import { EmailVO } from '../value-objects/email.vo';
+import { User } from '../../domain/entities/user.entity';
+import { EmailVO } from '../../domain/value-objects/email.vo';
+import { CreateUserCommand } from '../dtos/create-user.command';
 
 export abstract class UserRepository {
   abstract create(

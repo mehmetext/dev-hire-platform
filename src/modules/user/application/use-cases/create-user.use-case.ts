@@ -6,8 +6,8 @@ import { CompanyProfile } from 'src/modules/company/domain/entities/company-prof
 import { SubscriptionPlan } from 'src/modules/company/domain/enums/subscription-plan.enum';
 import { UnitOfWorkRepository } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { User } from '../../domain/entities/user.entity';
-import { UserRepository } from '../../domain/repositories/user.repository';
 import { CreateUserCommand } from '../dtos/create-user.command';
+import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class CreateUserUseCase {

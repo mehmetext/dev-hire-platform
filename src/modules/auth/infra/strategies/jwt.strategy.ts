@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserRepository } from 'src/modules/user/application/repositories/user.repository';
 import { UserNotFoundError } from 'src/modules/user/domain/errors';
-import { UserRepository } from 'src/modules/user/domain/repositories/user.repository';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {

@@ -1,11 +1,11 @@
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { UserRepository } from 'src/modules/user/application/repositories/user.repository';
 import { UserNotFoundError } from 'src/modules/user/domain/errors';
-import { UserRepository } from 'src/modules/user/domain/repositories/user.repository';
 import { InvalidTokenError } from '../../domain/errors';
-import { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
-import { TokenGeneratorRepository } from '../../domain/repositories/token-generator.repository';
 import { LoginResult } from '../dtos/login.result';
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
+import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
 import { LoginUseCase } from './login.use-case';
 
 export class RefreshTokenUseCase {

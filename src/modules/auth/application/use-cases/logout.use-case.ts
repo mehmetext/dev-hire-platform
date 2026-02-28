@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 
 export class LogoutUseCase {
   constructor(

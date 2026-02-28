@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/user/domain/entities/user.entity';
-import { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
-import { TokenGeneratorRepository } from '../../domain/repositories/token-generator.repository';
 import { LoginResult } from '../dtos/login.result';
+import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
+import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
 
 export class LoginUseCase {
   constructor(
