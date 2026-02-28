@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiNoContentResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { CreateUserCommand } from 'src/modules/user/application/dtos/create-user.command';
 import { User } from 'src/modules/user/domain/entities/user.entity';
@@ -19,6 +19,7 @@ import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
+import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RefreshTokenUseCase } from '../../application/use-cases/refresh-token.use-case';
 import { RegisterUseCase } from '../../application/use-cases/register.use-case';
 import { LoginResponseDto } from '../dtos/login-response.dto';
@@ -33,6 +34,7 @@ export class AuthController {
     @Inject(RegisterUseCase) private readonly registerUseCase: RegisterUseCase,
     @Inject(RefreshTokenUseCase)
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
+    @Inject(LogoutUseCase) private readonly logoutUseCase: LogoutUseCase,
   ) {}
 
   @UseGuards(AuthGuard('local'))
@@ -101,5 +103,15 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   async refreshToken(@Body() body: RefreshTokenDto): Promise<LoginResponseDto> {
     return this.refreshTokenUseCase.execute(body.refreshToken);
+  }
+
+  @Post('logout')
+  @ApiBearerAuth()
+  @ApiNoContentResponse()
+  @UseGuards(AuthGuard('jwt'))
+  async logout(
+    @Req() req: Request & { user: UserResponseDto & { jti: string } },
+  ): Promise<void> {
+    await this.logoutUseCase.execute(req.user.id, req.user.jti);
   }
 }
