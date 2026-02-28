@@ -1,8 +1,15 @@
-import { Prisma, Job as PrismaJob } from 'src/generated/prisma/client';
+import {
+  Prisma,
+  CompanyProfile as PrismaCompanyProfile,
+  Job as PrismaJob,
+} from 'src/generated/prisma/client';
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { Job } from '../../domain/entities/job.entity';
 
 export class PrismaJobMapper {
-  static toDomain(job: PrismaJob): Job {
+  static toDomain(
+    job: PrismaJob & { companyProfile?: PrismaCompanyProfile },
+  ): Job {
     return new Job(
       job.id,
       job.companyProfileId,
@@ -16,6 +23,18 @@ export class PrismaJobMapper {
       job.createdAt,
       job.updatedAt,
       job.deletedAt ?? undefined,
+      job.companyProfile
+        ? CompanyProfile.create({
+            id: job.companyProfile.id,
+            name: job.companyProfile.name,
+            logoUrl: job.companyProfile.logoUrl ?? undefined,
+            userId: job.companyProfile.userId,
+            subscriptionPlan: job.companyProfile.subscriptionPlan,
+            createdAt: job.companyProfile.createdAt,
+            updatedAt: job.companyProfile.updatedAt,
+            deletedAt: job.companyProfile.deletedAt ?? undefined,
+          })
+        : undefined,
     );
   }
 

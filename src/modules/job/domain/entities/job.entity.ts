@@ -1,3 +1,4 @@
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { JobStatus } from '../enums/job-status.enum';
 import { WorkType } from '../enums/work-type.enum';
 
@@ -15,6 +16,7 @@ export class Job {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | undefined,
+    public readonly companyProfile?: CompanyProfile,
   ) {}
 
   isDeleted(): boolean {
@@ -34,6 +36,7 @@ export class Job {
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date | undefined;
+    companyProfile?: CompanyProfile;
   }): Job {
     return new Job(
       params.id,
@@ -48,6 +51,7 @@ export class Job {
       params.createdAt ?? new Date(),
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
+      params.companyProfile ?? undefined,
     );
   }
 }

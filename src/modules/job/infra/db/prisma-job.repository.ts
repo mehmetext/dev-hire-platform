@@ -11,6 +11,24 @@ import { PrismaJobMapper } from './prisma-job.mapper';
 @Injectable()
 export class PrismaJobRepository implements JobRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(): Promise<Job[]> {
+    const jobs = await this.prisma.job.findMany({
+      include: {
+        companyProfile: true,
+      },
+      where: {
+        deletedAt: null,
+      },
+    });
+    return jobs.map((job) =>
+      PrismaJobMapper.toDomain({
+        ...job,
+        companyProfile: job.companyProfile ?? undefined,
+      }),
+    );
+  }
+
   async create(command: CreateJobCommand): Promise<Job> {
     const job = Job.create({
       id: randomUUID(),

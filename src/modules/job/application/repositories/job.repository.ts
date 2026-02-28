@@ -6,6 +6,7 @@ import { UpdateJobCommand } from '../dtos/update-job.command';
 @Injectable()
 export abstract class JobRepository {
   abstract create(command: CreateJobCommand): Promise<Job>;
+  abstract findAll(): Promise<Job[]>;
   abstract findById(id: string): Promise<Job | null>;
   abstract update(command: UpdateJobCommand): Promise<Job>;
   abstract delete(id: string): Promise<void>;
