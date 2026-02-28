@@ -1,7 +1,18 @@
+enum Role {
+  COMPANY
+  CANDIDATE
+  ADMIN
+}
+
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
+  id String @id @default(uuid())
+
+  email    String @unique
+  password String
+  role     Role
+
+  companyProfile CompanyProfile?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
