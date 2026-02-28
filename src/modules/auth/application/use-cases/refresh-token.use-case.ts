@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserRepository } from 'src/modules/user/application/repositories/user.repository';
 import { UserNotFoundError } from 'src/modules/user/domain/errors';
@@ -8,6 +8,7 @@ import { RefreshTokenRepository } from '../repositories/refresh-token.repository
 import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
 import { LoginUseCase } from './login.use-case';
 
+@Injectable()
 export class RefreshTokenUseCase {
   constructor(
     @Inject(TokenGeneratorRepository)

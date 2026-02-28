@@ -1,9 +1,10 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { UserRepository } from 'src/modules/user/application/repositories/user.repository';
 import { User } from 'src/modules/user/domain/entities/user.entity';
 import { EmailVO } from 'src/modules/user/domain/value-objects/email.vo';
 
+@Injectable()
 export class ValidateUserUseCase {
   constructor(
     @Inject(UserRepository) private readonly userRepository: UserRepository,
