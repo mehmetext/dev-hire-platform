@@ -24,3 +24,9 @@ export class JobExpiredError extends DomainError {
     super(message, StatusCode.BAD_REQUEST);
   }
 }
+
+export class CandidateCVNotFoundError extends DomainError {
+  constructor(message = 'Candidate CV not found') {
+    super(message, StatusCode.NOT_FOUND);
+  }
+}

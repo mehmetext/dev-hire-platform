@@ -12,5 +12,6 @@ export abstract class CandidateRepository {
     candidateProfile: CandidateProfile,
   ): Promise<CandidateProfile>;
   abstract delete(id: string): Promise<void>;
+  abstract findCvById(id: string): Promise<CandidateCV | null>;
   abstract findCvsByCandidateId(candidateId: string): Promise<CandidateCV[]>;
 }

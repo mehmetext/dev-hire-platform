@@ -49,8 +49,16 @@ export class PrismaCandidateRepository implements CandidateRepository {
 
   async findCvsByCandidateId(candidateId: string): Promise<CandidateCV[]> {
     const cvs = await this.prisma.candidateCV.findMany({
-      where: { candidateProfileId: candidateId },
+      where: { candidateProfileId: candidateId, deletedAt: null },
     });
     return cvs.map((cv) => PrismaCandidateCvMapper.toDomain(cv));
+  }
+
+  async findCvById(id: string): Promise<CandidateCV | null> {
+    const cv = await this.prisma.candidateCV.findUnique({
+      where: { id, deletedAt: null },
+    });
+    if (!cv) return null;
+    return PrismaCandidateCvMapper.toDomain(cv);
   }
 }

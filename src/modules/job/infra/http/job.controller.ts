@@ -24,6 +24,7 @@ import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use
 import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
+import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
@@ -47,6 +48,8 @@ export class JobController {
     private readonly deleteJobUseCase: DeleteJobUseCase,
     @Inject(ApplyJobUseCase)
     private readonly applyJobUseCase: ApplyJobUseCase,
+    @Inject(WithdrawJobUseCase)
+    private readonly withdrawJobUseCase: WithdrawJobUseCase,
   ) {}
 
   @Post()
@@ -84,6 +87,24 @@ export class JobController {
       jobId: id,
       candidateProfileId: req.user.candidateProfile.id,
       candidateCVId: applyJobDto.candidateCVId,
+    });
+  }
+
+  @Delete(':id/withdraw')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiNoContentResponse()
+  async withdrawJob(
+    @Param('id') id: string,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.candidateProfile?.id) {
+      throw new UnauthorizedException('Candidate profile not found');
+    }
+
+    return this.withdrawJobUseCase.execute({
+      jobId: id,
+      candidateProfileId: req.user.candidateProfile.id,
     });
   }
 
