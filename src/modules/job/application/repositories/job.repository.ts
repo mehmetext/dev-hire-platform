@@ -14,6 +14,9 @@ export abstract class JobRepository {
     jobId: string,
     candidateProfileId: string,
   ): Promise<JobApplication | null>;
+  abstract findAllJobApplicationsByJobId(
+    jobId: string,
+  ): Promise<JobApplication[]>;
   abstract create(command: CreateJobCommand): Promise<Job>;
   abstract findAll(): Promise<Job[]>;
   abstract findById(id: string): Promise<Job | null>;

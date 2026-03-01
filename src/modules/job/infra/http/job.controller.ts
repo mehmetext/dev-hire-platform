@@ -20,6 +20,7 @@ import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-gene
 import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
+import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
@@ -27,6 +28,7 @@ import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-cas
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
+import { JobApplicationResponseDto } from '../dtos/job-application-response.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
@@ -50,6 +52,8 @@ export class JobController {
     private readonly applyJobUseCase: ApplyJobUseCase,
     @Inject(WithdrawJobUseCase)
     private readonly withdrawJobUseCase: WithdrawJobUseCase,
+    @Inject(GetJobApplicationsByJobIdUseCase)
+    private readonly getJobApplicationsByJobIdUseCase: GetJobApplicationsByJobIdUseCase,
   ) {}
 
   @Post()
@@ -162,5 +166,13 @@ export class JobController {
       throw new UnauthorizedException('Company profile not found');
     }
     return this.deleteJobUseCase.execute(id, req.user.companyProfile.id);
+  }
+
+  @Get(':id/applications')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOkResponseGeneric(JobApplicationResponseDto, { isArray: true })
+  getJobApplicationsByJobId(@Param('id') id: string) {
+    return this.getJobApplicationsByJobIdUseCase.execute(id);
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { ApplyJobCommand } from '../../application/dtos/apply-job.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
@@ -76,7 +77,6 @@ export class PrismaJobRepository implements JobRepository {
     if (!jobApplication) return null;
 
     return JobApplication.create({
-      id: `${jobApplication.jobId}_${jobApplication.candidateProfileId}`,
       jobId: jobApplication.jobId,
       candidateProfileId: jobApplication.candidateProfileId,
       candidateCVId: jobApplication.candidateCVId,
@@ -190,5 +190,39 @@ export class PrismaJobRepository implements JobRepository {
     return this.prisma.job.count({
       where: { companyProfileId: companyId, deletedAt: null },
     });
+  }
+
+  async findAllJobApplicationsByJobId(
+    jobId: string,
+  ): Promise<JobApplication[]> {
+    const jobApplications = await this.prisma.jobApplication.findMany({
+      where: { jobId },
+      include: {
+        candidateProfile: true,
+      },
+    });
+
+    return jobApplications.map((jobApplication) =>
+      JobApplication.create({
+        jobId: jobApplication.jobId,
+        candidateProfileId: jobApplication.candidateProfileId,
+        candidateCVId: jobApplication.candidateCVId,
+        status: jobApplication.status,
+        createdAt: jobApplication.createdAt,
+        updatedAt: jobApplication.updatedAt,
+        deletedAt: jobApplication.deletedAt ?? undefined,
+        candidateProfile: jobApplication.candidateProfile
+          ? CandidateProfile.create({
+              id: jobApplication.candidateProfile.id,
+              firstName: jobApplication.candidateProfile.firstName,
+              lastName: jobApplication.candidateProfile.lastName,
+              userId: jobApplication.candidateProfile.userId,
+              createdAt: jobApplication.candidateProfile.createdAt,
+              updatedAt: jobApplication.candidateProfile.updatedAt,
+              deletedAt: jobApplication.candidateProfile.deletedAt ?? undefined,
+            })
+          : undefined,
+      }),
+    );
   }
 }
