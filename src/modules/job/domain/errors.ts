@@ -42,3 +42,9 @@ export class JobApplicationNotFoundError extends DomainError {
     super(message, StatusCode.NOT_FOUND);
   }
 }
+
+export class JobApplicationNotPendingError extends DomainError {
+  constructor(message = 'Job application is not in pending status') {
+    super(message, StatusCode.BAD_REQUEST);
+  }
+}

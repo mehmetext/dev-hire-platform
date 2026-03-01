@@ -11,7 +11,6 @@ import { Job } from '../../domain/entities/job.entity';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import {
   JobAlreadyAppliedError,
-  JobApplicationNotFoundError,
   JobExpiredError,
   JobNotActiveError,
   JobNotFoundError,
@@ -57,16 +56,6 @@ export class PrismaJobRepository implements JobRepository {
   }
 
   async withdraw(command: WithdrawJobCommand): Promise<void> {
-    const jobApplication =
-      await this.findApplicationByJobIdAndCandidateProfileId(
-        command.jobId,
-        command.candidateProfileId,
-      );
-
-    if (!jobApplication) {
-      throw new JobApplicationNotFoundError();
-    }
-
     await this.prisma.jobApplication.delete({
       where: {
         jobId_candidateProfileId: {
