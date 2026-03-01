@@ -1,4 +1,5 @@
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
+import { CandidateCV } from '../../domain/entities/candidate-cv.entity';
 import { CandidateProfile } from '../../domain/entities/candidate-profile.entity';
 
 export abstract class CandidateRepository {
@@ -11,4 +12,5 @@ export abstract class CandidateRepository {
     candidateProfile: CandidateProfile,
   ): Promise<CandidateProfile>;
   abstract delete(id: string): Promise<void>;
+  abstract findCvsByCandidateId(candidateId: string): Promise<CandidateCV[]>;
 }

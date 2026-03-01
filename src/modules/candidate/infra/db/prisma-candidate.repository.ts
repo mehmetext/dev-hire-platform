@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { CandidateRepository } from '../../application/repositories/candidate.repository';
+import { CandidateCV } from '../../domain/entities/candidate-cv.entity';
 import { CandidateProfile } from '../../domain/entities/candidate-profile.entity';
+import { PrismaCandidateCvMapper } from './prisma-candidate-cv.mapper';
 import { PrismaCandidateMapper } from './prisma-candidate.mapper';
 
 @Injectable()
@@ -43,5 +45,12 @@ export class PrismaCandidateRepository implements CandidateRepository {
     await this.prisma.candidateProfile.delete({
       where: { id },
     });
+  }
+
+  async findCvsByCandidateId(candidateId: string): Promise<CandidateCV[]> {
+    const cvs = await this.prisma.candidateCV.findMany({
+      where: { candidateProfileId: candidateId },
+    });
+    return cvs.map((cv) => PrismaCandidateCvMapper.toDomain(cv));
   }
 }
