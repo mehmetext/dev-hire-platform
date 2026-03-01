@@ -6,9 +6,12 @@ import { CreateJobCommand } from '../../application/dtos/create-job.command';
 import { UpdateJobCommand } from '../../application/dtos/update-job.command';
 import { WithdrawJobCommand } from '../../application/dtos/withdraw-job.command';
 import { JobRepository } from '../../application/repositories/job.repository';
+import { JobApplication } from '../../domain/entities/job-application.entity';
 import { Job } from '../../domain/entities/job.entity';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import {
+  JobAlreadyAppliedError,
+  JobApplicationNotFoundError,
   JobExpiredError,
   JobNotActiveError,
   JobNotFoundError,
@@ -34,6 +37,16 @@ export class PrismaJobRepository implements JobRepository {
       throw new JobExpiredError();
     }
 
+    const jobApplication =
+      await this.findApplicationByJobIdAndCandidateProfileId(
+        command.jobId,
+        command.candidateProfileId,
+      );
+
+    if (jobApplication) {
+      throw new JobAlreadyAppliedError();
+    }
+
     await this.prisma.jobApplication.create({
       data: {
         jobId: command.jobId,
@@ -44,10 +57,16 @@ export class PrismaJobRepository implements JobRepository {
   }
 
   async withdraw(command: WithdrawJobCommand): Promise<void> {
-    const job = await this.findById(command.jobId);
-    if (!job) {
-      throw new JobNotFoundError();
+    const jobApplication =
+      await this.findApplicationByJobIdAndCandidateProfileId(
+        command.jobId,
+        command.candidateProfileId,
+      );
+
+    if (!jobApplication) {
+      throw new JobApplicationNotFoundError();
     }
+
     await this.prisma.jobApplication.delete({
       where: {
         jobId_candidateProfileId: {
@@ -55,6 +74,27 @@ export class PrismaJobRepository implements JobRepository {
           candidateProfileId: command.candidateProfileId,
         },
       },
+    });
+  }
+
+  async findApplicationByJobIdAndCandidateProfileId(
+    jobId: string,
+    candidateProfileId: string,
+  ): Promise<JobApplication | null> {
+    const jobApplication = await this.prisma.jobApplication.findUnique({
+      where: { jobId_candidateProfileId: { jobId, candidateProfileId } },
+    });
+    if (!jobApplication) return null;
+
+    return JobApplication.create({
+      id: `${jobApplication.jobId}_${jobApplication.candidateProfileId}`,
+      jobId: jobApplication.jobId,
+      candidateProfileId: jobApplication.candidateProfileId,
+      candidateCVId: jobApplication.candidateCVId,
+      status: jobApplication.status,
+      createdAt: jobApplication.createdAt,
+      updatedAt: jobApplication.updatedAt,
+      deletedAt: jobApplication.deletedAt ?? undefined,
     });
   }
 

@@ -30,3 +30,15 @@ export class CandidateCVNotFoundError extends DomainError {
     super(message, StatusCode.NOT_FOUND);
   }
 }
+
+export class JobAlreadyAppliedError extends DomainError {
+  constructor(message = 'Job already applied') {
+    super(message, StatusCode.BAD_REQUEST);
+  }
+}
+
+export class JobApplicationNotFoundError extends DomainError {
+  constructor(message = 'Job application not found') {
+    super(message, StatusCode.NOT_FOUND);
+  }
+}
