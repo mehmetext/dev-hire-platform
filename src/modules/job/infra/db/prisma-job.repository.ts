@@ -21,11 +21,19 @@ export class PrismaJobRepository implements JobRepository {
       where: {
         deletedAt: null,
         status: JobStatus.ACTIVE,
-        expiresAt: {
-          gt: new Date(),
-        },
+        OR: [
+          {
+            expiresAt: null,
+          },
+          {
+            expiresAt: {
+              gt: new Date(),
+            },
+          },
+        ],
       },
     });
+
     return jobs.map((job) =>
       PrismaJobMapper.toDomain({
         ...job,
