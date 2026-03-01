@@ -12,3 +12,15 @@ export class JobNotAllowedError extends DomainError {
     super(message, StatusCode.FORBIDDEN);
   }
 }
+
+export class JobNotActiveError extends DomainError {
+  constructor(message = 'Job is not active') {
+    super(message, StatusCode.BAD_REQUEST);
+  }
+}
+
+export class JobExpiredError extends DomainError {
+  constructor(message = 'Job has expired') {
+    super(message, StatusCode.BAD_REQUEST);
+  }
+}

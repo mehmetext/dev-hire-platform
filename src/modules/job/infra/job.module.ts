@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JobRepository } from '../application/repositories/job.repository';
+import { ApplyJobUseCase } from '../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
 import { GetJobByIdUseCase } from '../application/use-cases/get-job-by-id.use-case';
@@ -23,6 +24,7 @@ import { JobController } from './http/job.controller';
     GetJobByIdUseCase,
     GetJobsUseCase,
     GetJobsByCompanyIdUseCase,
+    ApplyJobUseCase,
   ],
   exports: [JobRepository],
 })

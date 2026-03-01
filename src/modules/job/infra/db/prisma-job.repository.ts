@@ -1,18 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
+import { ApplyJobCommand } from '../../application/dtos/apply-job.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
 import { UpdateJobCommand } from '../../application/dtos/update-job.command';
 import { JobRepository } from '../../application/repositories/job.repository';
 import { Job } from '../../domain/entities/job.entity';
 import { JobStatus } from '../../domain/enums/job-status.enum';
-import { JobNotFoundError } from '../../domain/errors';
+import {
+  JobExpiredError,
+  JobNotActiveError,
+  JobNotFoundError,
+} from '../../domain/errors';
 import { PrismaJobMapper } from './prisma-job.mapper';
 
 @Injectable()
 export class PrismaJobRepository implements JobRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async apply(command: ApplyJobCommand): Promise<void> {
+    const job = await this.findById(command.jobId);
+
+    if (!job) {
+      throw new JobNotFoundError();
+    }
+
+    if (job.status !== JobStatus.ACTIVE) {
+      throw new JobNotActiveError();
+    }
+
+    if (job.expiresAt && job.expiresAt < new Date()) {
+      throw new JobExpiredError();
+    }
+
+    await this.prisma.jobApplication.create({
+      data: {
+        jobId: command.jobId,
+        candidateProfileId: command.candidateProfileId,
+        candidateCVId: command.candidateCVId,
+      },
+    });
+  }
   async findAll(): Promise<Job[]> {
     const jobs = await this.prisma.job.findMany({
       include: {

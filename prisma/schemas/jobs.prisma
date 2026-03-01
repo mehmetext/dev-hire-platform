@@ -49,7 +49,7 @@ model JobApplication {
   candidateCVId      String
   candidateCV        CandidateCV      @relation(fields: [candidateCVId], references: [id])
 
-  status JobApplicationStatus @map("status")
+  status JobApplicationStatus @default(PENDING) @map("status")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

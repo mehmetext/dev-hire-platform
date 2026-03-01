@@ -17,12 +17,14 @@ import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
+import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
+import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
@@ -43,6 +45,8 @@ export class JobController {
     private readonly getJobsByCompanyIdUseCase: GetJobsByCompanyIdUseCase,
     @Inject(DeleteJobUseCase)
     private readonly deleteJobUseCase: DeleteJobUseCase,
+    @Inject(ApplyJobUseCase)
+    private readonly applyJobUseCase: ApplyJobUseCase,
   ) {}
 
   @Post()
@@ -60,6 +64,26 @@ export class JobController {
     return this.createJobUseCase.execute({
       ...createJobDto,
       companyProfileId: req.user.companyProfile.id,
+    });
+  }
+
+  @Post(':id/apply')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiNoContentResponse()
+  async applyJob(
+    @Param('id') id: string,
+    @Body() applyJobDto: ApplyJobDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.candidateProfile?.id) {
+      throw new UnauthorizedException('Candidate profile not found');
+    }
+
+    return this.applyJobUseCase.execute({
+      jobId: id,
+      candidateProfileId: req.user.candidateProfile.id,
+      candidateCVId: applyJobDto.candidateCVId,
     });
   }
 
