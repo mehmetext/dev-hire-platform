@@ -1,5 +1,7 @@
+import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.entity';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { JobApplicationStatus } from '../enums/job-application-status.enum';
+import { Job } from './job.entity';
 
 export class JobApplication {
   constructor(
@@ -11,6 +13,8 @@ export class JobApplication {
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | undefined,
     public readonly candidateProfile: CandidateProfile | undefined,
+    public readonly job: Job | undefined,
+    public readonly candidateCV: CandidateCV | undefined,
   ) {}
 
   static create(params: {
@@ -22,6 +26,8 @@ export class JobApplication {
     updatedAt?: Date;
     deletedAt?: Date | undefined;
     candidateProfile?: CandidateProfile | undefined;
+    job?: Job | undefined;
+    candidateCV?: CandidateCV | undefined;
   }): JobApplication {
     return new JobApplication(
       params.jobId,
@@ -32,6 +38,8 @@ export class JobApplication {
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
       params.candidateProfile ?? undefined,
+      params.job ?? undefined,
+      params.candidateCV ?? undefined,
     );
   }
 

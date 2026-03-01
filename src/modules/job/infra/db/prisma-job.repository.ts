@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.entity';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
+import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { ApplyJobCommand } from '../../application/dtos/apply-job.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
+import { GetOwnedJobApplicationsCommand } from '../../application/dtos/get-owned-job-applications.command';
+import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
 import { UpdateJobCommand } from '../../application/dtos/update-job.command';
 import { WithdrawJobCommand } from '../../application/dtos/withdraw-job.command';
 import { JobRepository } from '../../application/repositories/job.repository';
@@ -17,7 +21,6 @@ import {
   JobNotFoundError,
 } from '../../domain/errors';
 import { PrismaJobMapper } from './prisma-job.mapper';
-import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
 
 @Injectable()
 export class PrismaJobRepository implements JobRepository {
@@ -246,5 +249,74 @@ export class PrismaJobRepository implements JobRepository {
       },
       data: { status: command.status },
     });
+  }
+
+  async findAllOwnedJobApplications(
+    command: GetOwnedJobApplicationsCommand,
+  ): Promise<JobApplication[]> {
+    const jobApplications = await this.prisma.jobApplication.findMany({
+      where: { candidateProfileId: command.candidateProfileId },
+      include: {
+        job: {
+          include: {
+            companyProfile: true,
+          },
+        },
+        candidateCV: true,
+      },
+    });
+    return jobApplications.map((jobApplication) =>
+      JobApplication.create({
+        jobId: jobApplication.jobId,
+        candidateProfileId: jobApplication.candidateProfileId,
+        candidateCVId: jobApplication.candidateCVId,
+        status: jobApplication.status,
+        createdAt: jobApplication.createdAt,
+        updatedAt: jobApplication.updatedAt,
+        deletedAt: jobApplication.deletedAt ?? undefined,
+        job: jobApplication.job
+          ? Job.create({
+              id: jobApplication.job.id,
+              companyProfileId: jobApplication.job.companyProfileId,
+              title: jobApplication.job.title,
+              description: jobApplication.job.description,
+              requirements: jobApplication.job.requirements,
+              location: jobApplication.job.location,
+              workType: jobApplication.job.workType,
+              status: jobApplication.job.status,
+              expiresAt: jobApplication.job.expiresAt ?? undefined,
+              createdAt: jobApplication.job.createdAt,
+              updatedAt: jobApplication.job.updatedAt,
+              deletedAt: jobApplication.job.deletedAt ?? undefined,
+              companyProfile: jobApplication.job.companyProfile
+                ? CompanyProfile.create({
+                    id: jobApplication.job.companyProfile.id,
+                    name: jobApplication.job.companyProfile.name,
+                    logoUrl:
+                      jobApplication.job.companyProfile.logoUrl ?? undefined,
+                    userId: jobApplication.job.companyProfile.userId,
+                    subscriptionPlan:
+                      jobApplication.job.companyProfile.subscriptionPlan,
+                    createdAt: jobApplication.job.companyProfile.createdAt,
+                    updatedAt: jobApplication.job.companyProfile.updatedAt,
+                    deletedAt:
+                      jobApplication.job.companyProfile.deletedAt ?? undefined,
+                  })
+                : undefined,
+            })
+          : undefined,
+        candidateCV: jobApplication.candidateCV
+          ? CandidateCV.create({
+              id: jobApplication.candidateCV.id,
+              candidateProfileId: jobApplication.candidateCV.candidateProfileId,
+              title: jobApplication.candidateCV.title ?? undefined,
+              url: jobApplication.candidateCV.url,
+              createdAt: jobApplication.candidateCV.createdAt,
+              updatedAt: jobApplication.candidateCV.updatedAt,
+              deletedAt: jobApplication.candidateCV.deletedAt ?? undefined,
+            })
+          : undefined,
+      }),
+    );
   }
 }

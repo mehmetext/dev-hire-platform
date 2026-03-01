@@ -3,6 +3,7 @@ import { JobApplication } from '../../domain/entities/job-application.entity';
 import { Job } from '../../domain/entities/job.entity';
 import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { CreateJobCommand } from '../dtos/create-job.command';
+import { GetOwnedJobApplicationsCommand } from '../dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../dtos/update-job-application-status-by-company.command';
 import { UpdateJobCommand } from '../dtos/update-job.command';
 import { WithdrawJobCommand } from '../dtos/withdraw-job.command';
@@ -29,4 +30,7 @@ export abstract class JobRepository {
   abstract updateJobApplicationStatusByCompany(
     command: UpdateJobApplicationStatusByCompanyCommand,
   ): Promise<void>;
+  abstract findAllOwnedJobApplications(
+    command: GetOwnedJobApplicationsCommand,
+  ): Promise<JobApplication[]>;
 }

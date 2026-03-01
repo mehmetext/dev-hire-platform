@@ -23,6 +23,7 @@ import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-cas
 import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
+import { GetOwnedJobApplicationsUseCase } from '../../application/use-cases/get-owned-job-applications.use-case';
 import { GetOwnedJobsUseCase } from '../../application/use-cases/get-owned-jobs.use-case';
 import { UpdateJobApplicationStatusByCompanyUseCase } from '../../application/use-cases/update-job-application-status-by-company.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
@@ -58,6 +59,8 @@ export class JobController {
     private readonly getJobApplicationsByJobIdUseCase: GetJobApplicationsByJobIdUseCase,
     @Inject(UpdateJobApplicationStatusByCompanyUseCase)
     private readonly updateJobApplicationStatusByCompanyUseCase: UpdateJobApplicationStatusByCompanyUseCase,
+    @Inject(GetOwnedJobApplicationsUseCase)
+    private readonly getOwnedJobApplicationsUseCase: GetOwnedJobApplicationsUseCase,
   ) {}
 
   @Post()
@@ -215,6 +218,23 @@ export class JobController {
       companyProfileId: req.user.companyProfile.id,
       candidateProfileId,
       status: updateJobApplicationStatusByCompanyDto.status,
+    });
+  }
+
+  @Get('applications/owned')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOkResponseGeneric(
+    OmitType(JobApplicationResponseDto, ['candidateProfile']),
+    { isArray: true },
+  )
+  getOwnedJobApplications(@Req() req: Request & { user: UserResponseDto }) {
+    if (!req.user.candidateProfile?.id) {
+      throw new UnauthorizedException('Candidate profile not found');
+    }
+
+    return this.getOwnedJobApplicationsUseCase.execute({
+      candidateProfileId: req.user.candidateProfile.id,
     });
   }
 }

@@ -7,6 +7,7 @@ import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobByIdUseCase } from '../application/use-cases/get-job-by-id.use-case';
 import { GetJobsUseCase } from '../application/use-cases/get-jobs.use-case';
+import { GetOwnedJobApplicationsUseCase } from '../application/use-cases/get-owned-job-applications.use-case';
 import { GetOwnedJobsUseCase } from '../application/use-cases/get-owned-jobs.use-case';
 import { UpdateJobApplicationStatusByCompanyUseCase } from '../application/use-cases/update-job-application-status-by-company.use-case';
 import { UpdateJobUseCase } from '../application/use-cases/update-job.use-case';
@@ -32,6 +33,7 @@ import { JobController } from './http/job.controller';
     WithdrawJobUseCase,
     GetJobApplicationsByJobIdUseCase,
     UpdateJobApplicationStatusByCompanyUseCase,
+    GetOwnedJobApplicationsUseCase,
   ],
   exports: [JobRepository],
 })

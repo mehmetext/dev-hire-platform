@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CandidateCvResponseDto } from 'src/modules/candidate/infra/dtos/candidate-cv-resposne.dto';
 import { CandidateResponseDto } from 'src/modules/candidate/infra/dtos/candidate-response.dto';
 import { JobApplicationStatus } from '../../domain/enums/job-application-status.enum';
+import { JobResponseDto } from './job-response.dto';
 
 export class JobApplicationResponseDto {
   @ApiProperty({
@@ -51,4 +53,16 @@ export class JobApplicationResponseDto {
     example: CandidateResponseDto,
   })
   candidateProfile?: CandidateResponseDto;
+
+  @ApiProperty({
+    description: 'The job of the job application',
+    example: JobResponseDto,
+  })
+  job?: JobResponseDto;
+
+  @ApiProperty({
+    description: 'The candidate CV of the job application',
+    example: CandidateCvResponseDto,
+  })
+  candidateCV?: CandidateCvResponseDto;
 }
