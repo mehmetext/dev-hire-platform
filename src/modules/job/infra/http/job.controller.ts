@@ -24,12 +24,14 @@ import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/ge
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { GetOwnedJobsUseCase } from '../../application/use-cases/get-owned-jobs.use-case';
+import { UpdateJobApplicationStatusByCompanyUseCase } from '../../application/use-cases/update-job-application-status-by-company.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { JobApplicationResponseDto } from '../dtos/job-application-response.dto';
 import { JobResponseDto } from '../dtos/job-response.dto';
+import { UpdateJobApplicationStatusByCompanyDto } from '../dtos/update-job-application-status-by-company.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
 
@@ -54,6 +56,8 @@ export class JobController {
     private readonly withdrawJobUseCase: WithdrawJobUseCase,
     @Inject(GetJobApplicationsByJobIdUseCase)
     private readonly getJobApplicationsByJobIdUseCase: GetJobApplicationsByJobIdUseCase,
+    @Inject(UpdateJobApplicationStatusByCompanyUseCase)
+    private readonly updateJobApplicationStatusByCompanyUseCase: UpdateJobApplicationStatusByCompanyUseCase,
   ) {}
 
   @Post()
@@ -188,6 +192,29 @@ export class JobController {
     return this.getJobApplicationsByJobIdUseCase.execute({
       jobId: id,
       companyProfileId: req.user.companyProfile.id,
+    });
+  }
+
+  @Put(':jobId/applications/:candidateProfileId/status')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiNoContentResponse()
+  updateJobApplicationStatusByCompany(
+    @Param('jobId') jobId: string,
+    @Param('candidateProfileId') candidateProfileId: string,
+    @Body()
+    updateJobApplicationStatusByCompanyDto: UpdateJobApplicationStatusByCompanyDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.companyProfile?.id) {
+      throw new UnauthorizedException('Company profile not found');
+    }
+
+    return this.updateJobApplicationStatusByCompanyUseCase.execute({
+      jobId,
+      companyProfileId: req.user.companyProfile.id,
+      candidateProfileId,
+      status: updateJobApplicationStatusByCompanyDto.status,
     });
   }
 }

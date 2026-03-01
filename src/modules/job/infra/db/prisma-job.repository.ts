@@ -17,6 +17,7 @@ import {
   JobNotFoundError,
 } from '../../domain/errors';
 import { PrismaJobMapper } from './prisma-job.mapper';
+import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
 
 @Injectable()
 export class PrismaJobRepository implements JobRepository {
@@ -231,5 +232,19 @@ export class PrismaJobRepository implements JobRepository {
       where: { companyProfileId, deletedAt: null },
     });
     return jobs.map((job) => PrismaJobMapper.toDomain(job));
+  }
+
+  async updateJobApplicationStatusByCompany(
+    command: UpdateJobApplicationStatusByCompanyCommand,
+  ): Promise<void> {
+    await this.prisma.jobApplication.update({
+      where: {
+        jobId_candidateProfileId: {
+          jobId: command.jobId,
+          candidateProfileId: command.candidateProfileId,
+        },
+      },
+      data: { status: command.status },
+    });
   }
 }
