@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiNoContentResponse, OmitType } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
@@ -30,8 +30,14 @@ import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-cas
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
-import { JobApplicationResponseDto } from '../dtos/job-application-response.dto';
-import { JobResponseDto } from '../dtos/job-response.dto';
+import {
+  JobApplicationResponseDto,
+  JobApplicationResponseWithoutCandidateDto,
+} from '../dtos/job-application-response.dto';
+import {
+  JobResponseDto,
+  JobResponseWithoutCompanyDto,
+} from '../dtos/job-response.dto';
 import { UpdateJobApplicationStatusByCompanyDto } from '../dtos/update-job-application-status-by-company.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
@@ -122,7 +128,7 @@ export class JobController {
   @Get('owned')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOkResponseGeneric(OmitType(JobResponseDto, ['companyProfile']), {
+  @ApiOkResponseGeneric(JobResponseWithoutCompanyDto, {
     isArray: true,
   })
   getOwnedJobs(@Req() req: Request & { user: UserResponseDto }) {
@@ -224,10 +230,9 @@ export class JobController {
   @Get('applications/owned')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOkResponseGeneric(
-    OmitType(JobApplicationResponseDto, ['candidateProfile']),
-    { isArray: true },
-  )
+  @ApiOkResponseGeneric(JobApplicationResponseWithoutCandidateDto, {
+    isArray: true,
+  })
   getOwnedJobApplications(@Req() req: Request & { user: UserResponseDto }) {
     if (!req.user.candidateProfile?.id) {
       throw new UnauthorizedException('Candidate profile not found');

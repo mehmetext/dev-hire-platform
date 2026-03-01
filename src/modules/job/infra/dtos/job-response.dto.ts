@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { CompanyResponseDto } from 'src/modules/company/infra/dtos/company-response.dto';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import { WorkType } from '../../domain/enums/work-type.enum';
@@ -84,3 +84,7 @@ export class JobResponseDto {
   })
   companyProfile?: CompanyResponseDto;
 }
+
+export class JobResponseWithoutCompanyDto extends OmitType(JobResponseDto, [
+  'companyProfile',
+]) {}

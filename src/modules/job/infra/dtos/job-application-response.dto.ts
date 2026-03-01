@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { CandidateCvResponseDto } from 'src/modules/candidate/infra/dtos/candidate-cv-resposne.dto';
 import { CandidateResponseDto } from 'src/modules/candidate/infra/dtos/candidate-response.dto';
 import { JobApplicationStatus } from '../../domain/enums/job-application-status.enum';
@@ -66,3 +66,8 @@ export class JobApplicationResponseDto {
   })
   candidateCV?: CandidateCvResponseDto;
 }
+
+export class JobApplicationResponseWithoutCandidateDto extends OmitType(
+  JobApplicationResponseDto,
+  ['candidateProfile'],
+) {}
