@@ -22,8 +22,8 @@ import { CreateJobUseCase } from '../../application/use-cases/create-job.use-cas
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
-import { GetJobsByCompanyIdUseCase } from '../../application/use-cases/get-jobs-by-company-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
+import { GetOwnedJobsUseCase } from '../../application/use-cases/get-owned-jobs.use-case';
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
@@ -44,8 +44,8 @@ export class JobController {
     private readonly getJobsUseCase: GetJobsUseCase,
     @Inject(UpdateJobUseCase)
     private readonly updateJobUseCase: UpdateJobUseCase,
-    @Inject(GetJobsByCompanyIdUseCase)
-    private readonly getJobsByCompanyIdUseCase: GetJobsByCompanyIdUseCase,
+    @Inject(GetOwnedJobsUseCase)
+    private readonly getOwnedJobsUseCase: GetOwnedJobsUseCase,
     @Inject(DeleteJobUseCase)
     private readonly deleteJobUseCase: DeleteJobUseCase,
     @Inject(ApplyJobUseCase)
@@ -112,6 +112,20 @@ export class JobController {
     });
   }
 
+  @Get('owned')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOkResponseGeneric(OmitType(JobResponseDto, ['companyProfile']), {
+    isArray: true,
+  })
+  getOwnedJobs(@Req() req: Request & { user: UserResponseDto }) {
+    if (!req.user.companyProfile?.id) {
+      throw new UnauthorizedException('Company profile not found');
+    }
+
+    return this.getOwnedJobsUseCase.execute(req.user.companyProfile.id);
+  }
+
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -124,14 +138,6 @@ export class JobController {
   @ApiOkResponseGeneric(JobResponseDto, { isArray: true })
   getJobs() {
     return this.getJobsUseCase.execute();
-  }
-
-  @Get('company/:companyId')
-  @ApiOkResponseGeneric(OmitType(JobResponseDto, ['companyProfile']), {
-    isArray: true,
-  })
-  getJobsByCompanyId(@Param('companyId') companyId: string) {
-    return this.getJobsByCompanyIdUseCase.execute(companyId);
   }
 
   @Put(':id')

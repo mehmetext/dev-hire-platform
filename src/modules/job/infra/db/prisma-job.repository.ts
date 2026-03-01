@@ -225,4 +225,11 @@ export class PrismaJobRepository implements JobRepository {
       }),
     );
   }
+
+  async findAllOwnedJobs(companyProfileId: string): Promise<Job[]> {
+    const jobs = await this.prisma.job.findMany({
+      where: { companyProfileId, deletedAt: null },
+    });
+    return jobs.map((job) => PrismaJobMapper.toDomain(job));
+  }
 }
