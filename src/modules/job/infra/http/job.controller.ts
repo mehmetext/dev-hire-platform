@@ -178,7 +178,16 @@ export class JobController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponseGeneric(JobApplicationResponseDto, { isArray: true })
-  getJobApplicationsByJobId(@Param('id') id: string) {
-    return this.getJobApplicationsByJobIdUseCase.execute(id);
+  getJobApplicationsByJobId(
+    @Param('id') id: string,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.companyProfile?.id) {
+      throw new UnauthorizedException('Company profile not found');
+    }
+    return this.getJobApplicationsByJobIdUseCase.execute({
+      jobId: id,
+      companyProfileId: req.user.companyProfile.id,
+    });
   }
 }
