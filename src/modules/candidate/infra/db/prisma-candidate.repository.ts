@@ -61,4 +61,45 @@ export class PrismaCandidateRepository implements CandidateRepository {
     if (!cv) return null;
     return PrismaCandidateCvMapper.toDomain(cv);
   }
+
+  async createCv(params: {
+    candidateProfileId: string;
+    title?: string;
+    url: string;
+  }): Promise<CandidateCV> {
+    const created = await this.prisma.candidateCV.create({
+      data: {
+        candidateProfileId: params.candidateProfileId,
+        title: params.title ?? undefined,
+        url: params.url,
+      },
+    });
+
+    return PrismaCandidateCvMapper.toDomain(created);
+  }
+
+  async updateCv(params: {
+    id: string;
+    candidateProfileId: string;
+    title?: string;
+    url: string;
+  }): Promise<CandidateCV> {
+    const updated = await this.prisma.candidateCV.update({
+      where: { id: params.id },
+      data: {
+        candidateProfileId: params.candidateProfileId,
+        title: params.title ?? undefined,
+        url: params.url,
+      },
+    });
+
+    return PrismaCandidateCvMapper.toDomain(updated);
+  }
+
+  async deleteCv(id: string): Promise<void> {
+    await this.prisma.candidateCV.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+  }
 }
