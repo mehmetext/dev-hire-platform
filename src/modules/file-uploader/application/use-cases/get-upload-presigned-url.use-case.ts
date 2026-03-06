@@ -39,6 +39,7 @@ export class GetUploadPresignedUrlUseCase {
         key,
         isPublic: rules.isPublic,
         contentType: command.contentType,
+        maxSizeMb: rules.maxSizeMb,
       });
 
     return new GetUploadPresignedUrlResult(url, fields, key);
