@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { Prisma } from 'src/generated/prisma/client';
 import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.entity';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { ApplyJobCommand } from '../../application/dtos/apply-job.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
+import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../../application/dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
 import { UpdateJobCommand } from '../../application/dtos/update-job.command';
@@ -91,25 +93,33 @@ export class PrismaJobRepository implements JobRepository {
     });
   }
 
-  async findAll(): Promise<Job[]> {
+  async findAll(command: GetJobsCommand): Promise<Job[]> {
+    const where: Prisma.JobWhereInput = {
+      deletedAt: null,
+      status: JobStatus.ACTIVE,
+      OR: [
+        {
+          expiresAt: null,
+        },
+        {
+          expiresAt: {
+            gt: new Date(),
+          },
+        },
+      ],
+    };
+
+    if (command.query) {
+      where.title = {
+        search: this.formatQuery(command.query),
+      };
+    }
+
     const jobs = await this.prisma.job.findMany({
       include: {
         companyProfile: true,
       },
-      where: {
-        deletedAt: null,
-        status: JobStatus.ACTIVE,
-        OR: [
-          {
-            expiresAt: null,
-          },
-          {
-            expiresAt: {
-              gt: new Date(),
-            },
-          },
-        ],
-      },
+      where,
     });
 
     return jobs.map((job) =>
@@ -118,6 +128,10 @@ export class PrismaJobRepository implements JobRepository {
         companyProfile: job.companyProfile ?? undefined,
       }),
     );
+  }
+
+  formatQuery(query: string): string {
+    return query.trim().split(/\s+/).filter(Boolean).join(' & ');
   }
 
   async findAllByCompanyId(companyId: string): Promise<Job[]> {

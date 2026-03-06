@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -17,6 +18,7 @@ import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
+import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
@@ -30,6 +32,7 @@ import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-cas
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
+import { GetJobsQueryDto } from '../dtos/get-jobs-query.dto';
 import {
   JobApplicationResponseWithoutCandidateDto,
   JobApplicationResponseWithoutJobDto,
@@ -149,8 +152,10 @@ export class JobController {
 
   @Get()
   @ApiOkResponseGeneric(JobResponseDto, { isArray: true })
-  getJobs() {
-    return this.getJobsUseCase.execute();
+  getJobs(@Query() getJobsQueryDto: GetJobsQueryDto) {
+    return this.getJobsUseCase.execute(
+      new GetJobsCommand(getJobsQueryDto.query),
+    );
   }
 
   @Put(':id')

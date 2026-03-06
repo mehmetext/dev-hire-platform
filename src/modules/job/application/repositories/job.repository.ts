@@ -3,6 +3,7 @@ import { JobApplication } from '../../domain/entities/job-application.entity';
 import { Job } from '../../domain/entities/job.entity';
 import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { CreateJobCommand } from '../dtos/create-job.command';
+import { GetJobsCommand } from '../dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../dtos/update-job-application-status-by-company.command';
 import { UpdateJobCommand } from '../dtos/update-job.command';
@@ -20,7 +21,7 @@ export abstract class JobRepository {
     jobId: string,
   ): Promise<JobApplication[]>;
   abstract create(command: CreateJobCommand): Promise<Job>;
-  abstract findAll(): Promise<Job[]>;
+  abstract findAll(command: GetJobsCommand): Promise<Job[]>;
   abstract findById(id: string): Promise<Job | null>;
   abstract findAllByCompanyId(companyId: string): Promise<Job[]>;
   abstract update(command: UpdateJobCommand): Promise<Job>;
