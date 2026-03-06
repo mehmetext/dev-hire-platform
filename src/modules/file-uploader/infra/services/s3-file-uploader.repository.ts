@@ -88,14 +88,9 @@ export class S3FileUploaderRepository extends FileUploaderRepository {
 
     const maxSizeBytes = params.maxSizeMb * 1024 * 1024;
 
-    const aclCondition = params.isPublic ? [{ acl: 'public-read' }] : [];
     const inputFields: Record<string, string> = {
       'Content-Type': params.contentType,
     };
-
-    if (params.isPublic) {
-      inputFields.acl = 'public-read';
-    }
 
     const { url, fields } = await createPresignedPost(this.s3, {
       Bucket: bucket,
@@ -103,7 +98,6 @@ export class S3FileUploaderRepository extends FileUploaderRepository {
       Conditions: [
         ['content-length-range', 0, maxSizeBytes],
         ['starts-with', '$Content-Type', params.contentType],
-        ...aclCondition,
       ],
       Fields: inputFields,
       Expires: expiresIn,
