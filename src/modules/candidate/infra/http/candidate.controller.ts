@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
   Put,
   Req,
@@ -17,13 +18,17 @@ import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
+import { UpdateCandidateProfileCommand } from '../../application/dtos/update-candidate-profile.command';
 import { CreateCandidateCvUseCase } from '../../application/use-cases/create-candidate-cv.use-case';
 import { DeleteCandidateCvUseCase } from '../../application/use-cases/delete-candidate-cv.use-case';
 import { GetCvsByCandidateIdUseCase } from '../../application/use-cases/get-cvs-by-candidate-id.use-case';
 import { UpdateCandidateCvUseCase } from '../../application/use-cases/update-candidate-cv.use-case';
+import { UpdateCandidateProfileUseCase } from '../../application/use-cases/update-candidate-profile.use-case';
 import { CandidateCvResponseDto } from '../dtos/candidate-cv-resposne.dto';
+import { CandidateResponseDto } from '../dtos/candidate-response.dto';
 import { CreateCandidateCvDto } from '../dtos/create-candidate-cv.dto';
 import { UpdateCandidateCvDto } from '../dtos/update-candidate-cv.dto';
+import { UpdateCandidateProfileDto } from '../dtos/update-candidate-profile.dto';
 
 @Controller('candidate')
 export class CandidateController {
@@ -36,7 +41,36 @@ export class CandidateController {
     private readonly updateCandidateCvUseCase: UpdateCandidateCvUseCase,
     @Inject(DeleteCandidateCvUseCase)
     private readonly deleteCandidateCvUseCase: DeleteCandidateCvUseCase,
+    @Inject(UpdateCandidateProfileUseCase)
+    private readonly updateCandidateProfileUseCase: UpdateCandidateProfileUseCase,
   ) {}
+
+  @Patch('profile/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOkResponseGeneric(CandidateResponseDto)
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() updateCandidateProfileDto: UpdateCandidateProfileDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    if (!req.user.candidateProfile?.id) {
+      throw new UnauthorizedException('Candidate profile not found');
+    }
+
+    if (req.user.candidateProfile.id !== id) {
+      throw new UnauthorizedException('You can only update your own profile');
+    }
+
+    return this.updateCandidateProfileUseCase.execute(
+      new UpdateCandidateProfileCommand(
+        id,
+        req.user.id,
+        updateCandidateProfileDto.firstName,
+        updateCandidateProfileDto.lastName,
+      ),
+    );
+  }
 
   @Get('cvs')
   @ApiBearerAuth()

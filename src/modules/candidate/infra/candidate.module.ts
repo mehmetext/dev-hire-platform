@@ -4,6 +4,7 @@ import { CreateCandidateCvUseCase } from '../application/use-cases/create-candid
 import { DeleteCandidateCvUseCase } from '../application/use-cases/delete-candidate-cv.use-case';
 import { GetCvsByCandidateIdUseCase } from '../application/use-cases/get-cvs-by-candidate-id.use-case';
 import { UpdateCandidateCvUseCase } from '../application/use-cases/update-candidate-cv.use-case';
+import { UpdateCandidateProfileUseCase } from '../application/use-cases/update-candidate-profile.use-case';
 import { PrismaCandidateRepository } from './db/prisma-candidate.repository';
 import { CandidateController } from './http/candidate.controller';
 
@@ -19,6 +20,7 @@ import { CandidateController } from './http/candidate.controller';
     CreateCandidateCvUseCase,
     UpdateCandidateCvUseCase,
     DeleteCandidateCvUseCase,
+    UpdateCandidateProfileUseCase,
   ],
   exports: [CandidateRepository],
 })
