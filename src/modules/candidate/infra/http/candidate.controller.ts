@@ -24,6 +24,10 @@ import { DeleteCandidateCvUseCase } from '../../application/use-cases/delete-can
 import { GetCvsByCandidateIdUseCase } from '../../application/use-cases/get-cvs-by-candidate-id.use-case';
 import { UpdateCandidateCvUseCase } from '../../application/use-cases/update-candidate-cv.use-case';
 import { UpdateCandidateProfileUseCase } from '../../application/use-cases/update-candidate-profile.use-case';
+import {
+  CandidateProfileNotAllowedError,
+  CandidateProfileNotFoundError,
+} from '../../domain/errors';
 import { CandidateCvResponseDto } from '../dtos/candidate-cv-resposne.dto';
 import { CandidateResponseDto } from '../dtos/candidate-response.dto';
 import { CreateCandidateCvDto } from '../dtos/create-candidate-cv.dto';
@@ -55,11 +59,11 @@ export class CandidateController {
     @Req() req: Request & { user: UserResponseDto },
   ) {
     if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
+      throw new CandidateProfileNotFoundError();
     }
 
     if (req.user.candidateProfile.id !== id) {
-      throw new UnauthorizedException('You can only update your own profile');
+      throw new CandidateProfileNotAllowedError();
     }
 
     return this.updateCandidateProfileUseCase.execute(
