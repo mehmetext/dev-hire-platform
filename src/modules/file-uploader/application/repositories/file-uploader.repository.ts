@@ -11,7 +11,7 @@ export type UploadFileParams = {
 
 export type PresignedUploadUrlParams = {
   /** Maximum size of the file in MB */
-  maxSizeMb?: number;
+  maxSizeMb: number;
   /** Object key inside the bucket, e.g. `avatars/user-1.png` */
   key: string;
   /** Whether the file should be publicly accessible */

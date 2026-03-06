@@ -86,7 +86,7 @@ export class S3FileUploaderRepository extends FileUploaderRepository {
 
     const expiresIn = params.expiresInSeconds ?? 900;
 
-    const maxSizeBytes = (params.maxSizeMb || 1) * 1024 * 1024;
+    const maxSizeBytes = params.maxSizeMb * 1024 * 1024;
 
     const aclCondition = params.isPublic ? [{ acl: 'public-read' }] : [];
     const inputFields: Record<string, string> = {
