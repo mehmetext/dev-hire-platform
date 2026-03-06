@@ -19,7 +19,7 @@ model CandidateProfile {
 model CandidateCV {
   id String @id @default(uuid())
 
-  candidateProfileId String           @unique @map("candidate_profile_id")
+  candidateProfileId String           @map("candidate_profile_id")
   candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id])
   jobApplications    JobApplication[]
 
