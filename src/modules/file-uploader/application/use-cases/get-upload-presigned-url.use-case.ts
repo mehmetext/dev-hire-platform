@@ -34,12 +34,13 @@ export class GetUploadPresignedUrlUseCase {
 
     const key = `${rules.folder}/user-${command.userId}/${uniqueId}.${extension}`;
 
-    const url = await this.fileUploaderRepository.getUploadPresignedUrl({
-      key,
-      isPublic: rules.isPublic,
-      contentType: command.contentType,
-    });
+    const { url, fields } =
+      await this.fileUploaderRepository.getUploadPresignedUrl({
+        key,
+        isPublic: rules.isPublic,
+        contentType: command.contentType,
+      });
 
-    return new GetUploadPresignedUrlResult(url, key);
+    return new GetUploadPresignedUrlResult(url, fields, key);
   }
 }

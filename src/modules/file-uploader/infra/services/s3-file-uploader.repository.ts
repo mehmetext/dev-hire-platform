@@ -3,12 +3,14 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   FileUploaderRepository,
   PresignedDownloadUrlParams,
+  PresignedPostResult,
   PresignedUploadUrlParams,
   UploadFileParams,
 } from '../../application/repositories/file-uploader.repository';
@@ -77,21 +79,37 @@ export class S3FileUploaderRepository extends FileUploaderRepository {
 
   async getUploadPresignedUrl(
     params: PresignedUploadUrlParams,
-  ): Promise<string> {
+  ): Promise<PresignedPostResult> {
     const bucket = params.isPublic
       ? this.publicBucketName
       : this.privateBucketName;
 
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: params.key,
-      ContentType: params.contentType,
-      ACL: params.isPublic ? 'public-read' : undefined,
-    });
-
     const expiresIn = params.expiresInSeconds ?? 900;
 
-    return await getSignedUrl(this.s3, command, { expiresIn });
+    const maxSizeBytes = (params.maxSizeMb || 1) * 1024 * 1024;
+
+    const aclCondition = params.isPublic ? [{ acl: 'public-read' }] : [];
+    const inputFields: Record<string, string> = {
+      'Content-Type': params.contentType,
+    };
+
+    if (params.isPublic) {
+      inputFields.acl = 'public-read';
+    }
+
+    const { url, fields } = await createPresignedPost(this.s3, {
+      Bucket: bucket,
+      Key: params.key,
+      Conditions: [
+        ['content-length-range', 0, maxSizeBytes],
+        ['starts-with', '$Content-Type', params.contentType],
+        ...aclCondition,
+      ],
+      Fields: inputFields,
+      Expires: expiresIn,
+    });
+
+    return { url, fields };
   }
 
   async getDownloadPresignedUrl(

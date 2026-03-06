@@ -10,6 +10,8 @@ export type UploadFileParams = {
 };
 
 export type PresignedUploadUrlParams = {
+  /** Maximum size of the file in MB */
+  maxSizeMb?: number;
   /** Object key inside the bucket, e.g. `avatars/user-1.png` */
   key: string;
   /** Whether the file should be publicly accessible */
@@ -18,6 +20,11 @@ export type PresignedUploadUrlParams = {
   contentType: string;
   /** Expiration in seconds (default: 900s) */
   expiresInSeconds?: number;
+};
+
+export type PresignedPostResult = {
+  url: string;
+  fields: Record<string, string>;
 };
 
 export type PresignedDownloadUrlParams = {
@@ -40,7 +47,7 @@ export abstract class FileUploaderRepository {
    */
   abstract getUploadPresignedUrl(
     params: PresignedUploadUrlParams,
-  ): Promise<string>;
+  ): Promise<PresignedPostResult>;
 
   /**
    * Generate a presigned URL that allows the client to download a file.
