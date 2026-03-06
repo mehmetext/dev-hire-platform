@@ -130,6 +130,10 @@ export class PrismaJobRepository implements JobRepository {
       });
     }
 
+    if (command.workType) {
+      and?.push({ workType: command.workType });
+    }
+
     const where: Prisma.JobWhereInput = {
       deletedAt: null,
       status: JobStatus.ACTIVE,

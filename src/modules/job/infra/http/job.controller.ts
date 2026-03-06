@@ -154,7 +154,7 @@ export class JobController {
   @ApiOkResponseGeneric(JobResponseDto, { isArray: true })
   getJobs(@Query() getJobsQueryDto: GetJobsQueryDto) {
     return this.getJobsUseCase.execute(
-      new GetJobsCommand(getJobsQueryDto.query),
+      new GetJobsCommand(getJobsQueryDto.query, getJobsQueryDto.workType),
     );
   }
 
