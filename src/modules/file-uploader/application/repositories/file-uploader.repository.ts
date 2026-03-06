@@ -48,4 +48,9 @@ export abstract class FileUploaderRepository {
   abstract getDownloadPresignedUrl(
     params: PresignedDownloadUrlParams,
   ): Promise<string>;
+
+  /**
+   * Generate a public URL for a file.
+   */
+  abstract getPublicUrl(key: string): string;
 }

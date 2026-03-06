@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Inject,
-  Param,
   Patch,
   Req,
   UseGuards,
@@ -14,10 +13,7 @@ import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
 import { UpdateCompanyProfileCommand } from '../../application/dtos/update-company-profile.command';
 import { UpdateCompanyProfileUseCase } from '../../application/use-cases/update-company-profile.use-case';
-import {
-  CompanyProfileNotAllowedError,
-  CompanyProfileNotFoundError,
-} from '../../domain/errors';
+import { CompanyProfileNotFoundError } from '../../domain/errors';
 import { CompanyResponseDto } from '../dtos/company-response.dto';
 import { UpdateCompanyProfileDto } from '../dtos/update-company-profile.dto';
 
@@ -28,12 +24,11 @@ export class CompanyController {
     private readonly updateCompanyProfileUseCase: UpdateCompanyProfileUseCase,
   ) {}
 
-  @Patch('profile/:id')
+  @Patch('profile')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponseGeneric(CompanyResponseDto)
   async updateProfile(
-    @Param('id') id: string,
     @Body() updateCompanyProfileDto: UpdateCompanyProfileDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
@@ -41,9 +36,7 @@ export class CompanyController {
       throw new CompanyProfileNotFoundError();
     }
 
-    if (req.user.companyProfile.id !== id) {
-      throw new CompanyProfileNotAllowedError();
-    }
+    const id = req.user.companyProfile.id;
 
     return this.updateCompanyProfileUseCase.execute(
       new UpdateCompanyProfileCommand(

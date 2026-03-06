@@ -110,4 +110,12 @@ export class S3FileUploaderRepository extends FileUploaderRepository {
 
     return await getSignedUrl(this.s3, command, { expiresIn });
   }
+
+  getPublicUrl(key: string): string {
+    if (this.endpoint?.includes('localhost')) {
+      return `${this.endpoint}/${this.publicBucketName}/${key}`;
+    }
+
+    return `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com/${key}`;
+  }
 }

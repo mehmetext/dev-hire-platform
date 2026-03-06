@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { GetPublicUrlUseCase } from 'src/modules/file-uploader/application/use-cases/get-public-url.use-case';
 import { CompanyProfile } from '../../domain/entities/company-profile.entity';
 import {
   CompanyProfileNotAllowedError,
@@ -11,6 +12,8 @@ export class UpdateCompanyProfileUseCase {
   constructor(
     @Inject(CompanyRepository)
     private readonly companyRepository: CompanyRepository,
+    @Inject(GetPublicUrlUseCase)
+    private readonly getPublicUrlUseCase: GetPublicUrlUseCase,
   ) {}
 
   async execute(command: UpdateCompanyProfileCommand): Promise<CompanyProfile> {
@@ -24,11 +27,15 @@ export class UpdateCompanyProfileUseCase {
       throw new CompanyProfileNotAllowedError();
     }
 
+    const logoUrl = command.logoUrl
+      ? this.getPublicUrlUseCase.execute(command.logoUrl)
+      : existing.logoUrl;
+
     const updated = CompanyProfile.create({
       id: existing.id,
       userId: existing.userId,
       name: command.name ?? existing.name,
-      logoUrl: command.logoUrl ?? existing.logoUrl,
+      logoUrl,
       subscriptionPlan: existing.subscriptionPlan,
       createdAt: existing.createdAt,
       updatedAt: existing.updatedAt,

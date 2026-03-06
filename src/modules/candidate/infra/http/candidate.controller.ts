@@ -24,10 +24,7 @@ import { DeleteCandidateCvUseCase } from '../../application/use-cases/delete-can
 import { GetCvsByCandidateIdUseCase } from '../../application/use-cases/get-cvs-by-candidate-id.use-case';
 import { UpdateCandidateCvUseCase } from '../../application/use-cases/update-candidate-cv.use-case';
 import { UpdateCandidateProfileUseCase } from '../../application/use-cases/update-candidate-profile.use-case';
-import {
-  CandidateProfileNotAllowedError,
-  CandidateProfileNotFoundError,
-} from '../../domain/errors';
+import { CandidateProfileNotFoundError } from '../../domain/errors';
 import { CandidateCvResponseDto } from '../dtos/candidate-cv-resposne.dto';
 import { CandidateResponseDto } from '../dtos/candidate-response.dto';
 import { CreateCandidateCvDto } from '../dtos/create-candidate-cv.dto';
@@ -49,12 +46,11 @@ export class CandidateController {
     private readonly updateCandidateProfileUseCase: UpdateCandidateProfileUseCase,
   ) {}
 
-  @Patch('profile/:id')
+  @Patch('profile')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponseGeneric(CandidateResponseDto)
   async updateProfile(
-    @Param('id') id: string,
     @Body() updateCandidateProfileDto: UpdateCandidateProfileDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
@@ -62,9 +58,7 @@ export class CandidateController {
       throw new CandidateProfileNotFoundError();
     }
 
-    if (req.user.candidateProfile.id !== id) {
-      throw new CandidateProfileNotAllowedError();
-    }
+    const id = req.user.candidateProfile.id;
 
     return this.updateCandidateProfileUseCase.execute(
       new UpdateCandidateProfileCommand(

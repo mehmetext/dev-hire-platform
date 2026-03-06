@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUrl, MinLength } from 'class-validator';
+import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateCompanyProfileDto {
   @IsOptional()
@@ -13,7 +13,6 @@ export class UpdateCompanyProfileDto {
 
   @IsOptional()
   @IsString()
-  @IsUrl()
   @ApiPropertyOptional({
     description: 'The logo URL of the company',
     example: 'https://example.com/new-logo.png',
