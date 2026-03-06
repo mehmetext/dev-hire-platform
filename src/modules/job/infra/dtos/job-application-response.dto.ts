@@ -71,3 +71,8 @@ export class JobApplicationResponseWithoutCandidateDto extends OmitType(
   JobApplicationResponseDto,
   ['candidateProfile'],
 ) {}
+
+export class JobApplicationResponseWithoutJobDto extends OmitType(
+  JobApplicationResponseDto,
+  ['job'],
+) {}

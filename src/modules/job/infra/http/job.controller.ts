@@ -31,8 +31,8 @@ import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use
 import { ApplyJobDto } from '../dtos/apply-job.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import {
-  JobApplicationResponseDto,
   JobApplicationResponseWithoutCandidateDto,
+  JobApplicationResponseWithoutJobDto,
 } from '../dtos/job-application-response.dto';
 import {
   JobResponseDto,
@@ -190,7 +190,9 @@ export class JobController {
   @Get(':id/applications')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOkResponseGeneric(JobApplicationResponseDto, { isArray: true })
+  @ApiOkResponseGeneric(JobApplicationResponseWithoutJobDto, {
+    isArray: true,
+  })
   getJobApplicationsByJobId(
     @Param('id') id: string,
     @Req() req: Request & { user: UserResponseDto },

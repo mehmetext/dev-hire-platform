@@ -203,6 +203,7 @@ export class PrismaJobRepository implements JobRepository {
       where: { jobId },
       include: {
         candidateProfile: true,
+        candidateCV: true,
       },
     });
 
@@ -224,6 +225,17 @@ export class PrismaJobRepository implements JobRepository {
               createdAt: jobApplication.candidateProfile.createdAt,
               updatedAt: jobApplication.candidateProfile.updatedAt,
               deletedAt: jobApplication.candidateProfile.deletedAt ?? undefined,
+            })
+          : undefined,
+        candidateCV: jobApplication.candidateCV
+          ? CandidateCV.create({
+              id: jobApplication.candidateCV.id,
+              candidateProfileId: jobApplication.candidateCV.candidateProfileId,
+              title: jobApplication.candidateCV.title ?? undefined,
+              url: jobApplication.candidateCV.url,
+              createdAt: jobApplication.candidateCV.createdAt,
+              updatedAt: jobApplication.candidateCV.updatedAt,
+              deletedAt: jobApplication.candidateCV.deletedAt ?? undefined,
             })
           : undefined,
       }),
