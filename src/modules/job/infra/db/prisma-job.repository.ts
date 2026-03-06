@@ -94,26 +94,47 @@ export class PrismaJobRepository implements JobRepository {
   }
 
   async findAll(command: GetJobsCommand): Promise<Job[]> {
+    const and: Prisma.JobWhereInput['AND'] = [
+      {
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    ];
+
+    if (command.query) {
+      const searchQuery = command.query.trim();
+      const fullTextSearch = this.formatQuery(searchQuery);
+
+      and?.push({
+        OR: [
+          { title: { search: fullTextSearch } },
+          { title: { contains: searchQuery, mode: 'insensitive' } },
+          { requirementsText: { search: fullTextSearch } },
+          {
+            requirementsText: { contains: searchQuery, mode: 'insensitive' },
+          },
+          { description: { search: fullTextSearch } },
+          { description: { contains: searchQuery, mode: 'insensitive' } },
+          { location: { search: fullTextSearch } },
+          { location: { contains: searchQuery, mode: 'insensitive' } },
+          {
+            companyProfile: {
+              name: { search: fullTextSearch },
+            },
+          },
+          {
+            companyProfile: {
+              name: { contains: searchQuery, mode: 'insensitive' },
+            },
+          },
+        ],
+      });
+    }
+
     const where: Prisma.JobWhereInput = {
       deletedAt: null,
       status: JobStatus.ACTIVE,
-      OR: [
-        {
-          expiresAt: null,
-        },
-        {
-          expiresAt: {
-            gt: new Date(),
-          },
-        },
-      ],
+      AND: and,
     };
-
-    if (command.query) {
-      where.title = {
-        search: this.formatQuery(command.query),
-      };
-    }
 
     const jobs = await this.prisma.job.findMany({
       include: {

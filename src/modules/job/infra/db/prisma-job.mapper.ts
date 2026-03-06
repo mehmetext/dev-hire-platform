@@ -44,6 +44,7 @@ export class PrismaJobMapper {
       title: job.title,
       description: job.description,
       requirements: job.requirements,
+      requirementsText: job.requirements.join('\n'),
       location: job.location,
       workType: job.workType,
       status: job.status,
