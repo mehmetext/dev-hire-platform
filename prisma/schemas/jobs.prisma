@@ -95,5 +95,6 @@ model JobQuestionAnswers {
 
   answer String
 
+  @@unique([jobQuestionId, jobApplicationId])
   @@map("job_question_answers")
 }
