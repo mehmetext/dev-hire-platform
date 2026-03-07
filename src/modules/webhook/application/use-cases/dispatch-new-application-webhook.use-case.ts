@@ -70,12 +70,6 @@ export class DispatchNewApplicationWebhookUseCase {
 
       await this.recordDelivery(webhook.webhookId, payload, 'FAILED');
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.startsWith('Webhook server')
-      ) {
-        throw error;
-      }
       await this.recordDelivery(webhook.webhookId, payload, 'FAILED');
       throw error;
     }
