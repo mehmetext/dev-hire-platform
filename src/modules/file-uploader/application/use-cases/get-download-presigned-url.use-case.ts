@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { InvalidFileUploadTypeError } from '../../domain/errors';
 import { FileUploadRules } from '../../domain/file-upload-rules';
-import { InvalidFileUploadTypeError } from '../../errors';
 import { GetDownloadPresignedUrlCommand } from '../dtos/get-download-presigned-url.command';
 import { GetDownloadPresignedUrlResult } from '../dtos/get-download-presigned-url.result';
 import { FileUploaderRepository } from '../repositories/file-uploader.repository';

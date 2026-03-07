@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as mime from 'mime-types';
-import { FileUploadRules } from '../../domain/file-upload-rules';
 import {
   InvalidFileUploadContentTypeError,
   InvalidFileUploadTypeError,
-} from '../../errors';
+} from '../../domain/errors';
+import { FileUploadRules } from '../../domain/file-upload-rules';
 import { GetUploadPresignedUrlCommand } from '../dtos/get-upload-presigned-url.command';
 import { GetUploadPresignedUrlResult } from '../dtos/get-upload-presigned-url.result';
 import { FileUploaderRepository } from '../repositories/file-uploader.repository';
