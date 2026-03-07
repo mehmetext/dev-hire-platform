@@ -29,8 +29,13 @@ export class PrismaCompanyRepository implements CompanyRepository {
 
     return PrismaCompanyMapper.toDomain(companyProfile);
   }
-  async update(companyProfile: CompanyProfile): Promise<CompanyProfile> {
-    const updated = await this.prisma.companyProfile.update({
+  async update(
+    companyProfile: CompanyProfile,
+    options?: { tx?: TransactionContext },
+  ): Promise<CompanyProfile> {
+    const client = (options?.tx ?? this.prisma) as PrismaService;
+
+    const updated = await client.companyProfile.update({
       where: { id: companyProfile.id },
       data: PrismaCompanyMapper.toUpdatePersistence(companyProfile),
     });

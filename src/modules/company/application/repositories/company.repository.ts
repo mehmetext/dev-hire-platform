@@ -7,6 +7,9 @@ export abstract class CompanyRepository {
     options?: { tx?: TransactionContext },
   ): Promise<CompanyProfile>;
   abstract findById(id: string): Promise<CompanyProfile | null>;
-  abstract update(companyProfile: CompanyProfile): Promise<CompanyProfile>;
+  abstract update(
+    companyProfile: CompanyProfile,
+    options?: { tx?: TransactionContext },
+  ): Promise<CompanyProfile>;
   abstract delete(id: string): Promise<void>;
 }

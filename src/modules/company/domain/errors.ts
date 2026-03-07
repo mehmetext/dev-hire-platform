@@ -12,3 +12,9 @@ export class CompanyProfileNotAllowedError extends DomainError {
     super(message, StatusCode.FORBIDDEN);
   }
 }
+
+export class CompanyProfileAlreadyUpgradedError extends DomainError {
+  constructor(message = 'Company profile already upgraded') {
+    super(message, StatusCode.BAD_REQUEST);
+  }
+}
