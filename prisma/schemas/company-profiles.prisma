@@ -24,6 +24,7 @@ model CompanyProfile {
 }
 
 model CompanyWebhook {
+  id               String         @id @default(uuid())
   companyProfileId String
   companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id])
 
