@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import {
   JobApplicationNotFoundError,
-  JobNotAllowedError,
   JobNotFoundError,
 } from '../../domain/errors';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../dtos/update-job-application-status-by-company.command';
@@ -32,9 +31,7 @@ export class UpdateJobApplicationStatusByCompanyUseCase {
       throw new JobNotFoundError();
     }
 
-    if (job.companyProfileId !== command.companyProfileId) {
-      throw new JobNotAllowedError();
-    }
+    job.assertOwnedBy(command.companyProfileId);
 
     return this.jobRepository.updateJobApplicationStatusByCompany(command);
   }

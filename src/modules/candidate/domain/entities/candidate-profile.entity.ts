@@ -1,3 +1,5 @@
+import { CandidateProfileNotAllowedError } from '../errors';
+
 export class CandidateProfile {
   constructor(
     public readonly id: string,
@@ -31,5 +33,11 @@ export class CandidateProfile {
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
     );
+  }
+
+  assertOwnedBy(userId: string): void {
+    if (this.userId !== userId) {
+      throw new CandidateProfileNotAllowedError();
+    }
   }
 }

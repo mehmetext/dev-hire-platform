@@ -1,4 +1,5 @@
 import { SubscriptionPlan } from '../enums/subscription-plan.enum';
+import { CompanyProfileNotAllowedError } from '../errors';
 
 export class CompanyProfile {
   constructor(
@@ -36,5 +37,11 @@ export class CompanyProfile {
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
     );
+  }
+
+  assertOwnedBy(userId: string): void {
+    if (this.userId !== userId) {
+      throw new CompanyProfileNotAllowedError();
+    }
   }
 }

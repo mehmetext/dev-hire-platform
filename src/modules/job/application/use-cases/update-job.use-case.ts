@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Job } from '../../domain/entities/job.entity';
-import { JobNotAllowedError, JobNotFoundError } from '../../domain/errors';
+import { JobNotFoundError } from '../../domain/errors';
 import { UpdateJobCommand } from '../dtos/update-job.command';
 import { JobRepository } from '../repositories/job.repository';
 
@@ -14,9 +14,7 @@ export class UpdateJobUseCase {
     if (!job) {
       throw new JobNotFoundError();
     }
-    if (command.companyProfileId !== job.companyProfileId) {
-      throw new JobNotAllowedError();
-    }
+    job.assertOwnedBy(command.companyProfileId);
     return this.jobRepository.update(command);
   }
 }

@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { JobNotAllowedError, JobNotFoundError } from '../../domain/errors';
+import { JobNotFoundError } from '../../domain/errors';
 import { JobRepository } from '../repositories/job.repository';
 
 export class DeleteJobUseCase {
@@ -13,9 +13,7 @@ export class DeleteJobUseCase {
     if (!job) {
       throw new JobNotFoundError();
     }
-    if (job.companyProfileId !== companyProfileId) {
-      throw new JobNotAllowedError();
-    }
+    job.assertOwnedBy(companyProfileId);
     await this.jobRepository.delete(id);
   }
 }

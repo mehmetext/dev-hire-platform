@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { JobApplication } from '../../domain/entities/job-application.entity';
-import { JobNotAllowedError, JobNotFoundError } from '../../domain/errors';
+import { JobNotFoundError } from '../../domain/errors';
 import { GetJobApplicationsByJobIdCommand } from '../dtos/get-job-applications-by-job-id.command';
 import { JobRepository } from '../repositories/job.repository';
 
@@ -19,11 +19,7 @@ export class GetJobApplicationsByJobIdUseCase {
     if (!job) {
       throw new JobNotFoundError();
     }
-    if (
-      job.companyProfileId !== getJobApplicationsByJobIdCommand.companyProfileId
-    ) {
-      throw new JobNotAllowedError();
-    }
+    job.assertOwnedBy(getJobApplicationsByJobIdCommand.companyProfileId);
     return this.jobRepository.findAllJobApplicationsByJobId(
       getJobApplicationsByJobIdCommand.jobId,
     );

@@ -1,6 +1,6 @@
 import { Inject, UnauthorizedException } from '@nestjs/common';
-import { CandidateCVNotFoundError } from 'src/modules/job/domain/errors';
 import { CandidateCV } from '../../domain/entities/candidate-cv.entity';
+import { CandidateCVNotFoundError } from '../../domain/errors';
 import { CandidateRepository } from '../repositories/candidate.repository';
 
 export class UpdateCandidateCvUseCase {

@@ -25,12 +25,6 @@ export class JobExpiredError extends DomainError {
   }
 }
 
-export class CandidateCVNotFoundError extends DomainError {
-  constructor(message = 'Candidate CV not found') {
-    super(message, StatusCode.NOT_FOUND);
-  }
-}
-
 export class JobAlreadyAppliedError extends DomainError {
   constructor(message = 'Job already applied') {
     super(message, StatusCode.BAD_REQUEST);

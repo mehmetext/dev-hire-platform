@@ -1,3 +1,5 @@
+import { CandidateCvNotAllowedError } from '../errors';
+
 export class CandidateCV {
   constructor(
     public readonly id: string,
@@ -31,5 +33,11 @@ export class CandidateCV {
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
     );
+  }
+
+  assertBelongsTo(candidateProfileId: string): void {
+    if (this.candidateProfileId !== candidateProfileId) {
+      throw new CandidateCvNotAllowedError();
+    }
   }
 }

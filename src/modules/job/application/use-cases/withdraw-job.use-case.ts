@@ -1,9 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { JobApplicationStatus } from '../../domain/enums/job-application-status.enum';
-import {
-  JobApplicationNotFoundError,
-  JobApplicationNotPendingError,
-} from '../../domain/errors';
+import { JobApplicationNotFoundError } from '../../domain/errors';
 import { WithdrawJobCommand } from '../dtos/withdraw-job.command';
 import { JobRepository } from '../repositories/job.repository';
 
@@ -24,9 +20,7 @@ export class WithdrawJobUseCase {
       throw new JobApplicationNotFoundError();
     }
 
-    if (jobApplication.status !== JobApplicationStatus.PENDING) {
-      throw new JobApplicationNotPendingError();
-    }
+    jobApplication.assertCanWithdraw();
 
     await this.jobRepository.withdraw(command);
   }

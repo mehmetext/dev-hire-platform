@@ -1,6 +1,11 @@
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { JobStatus } from '../enums/job-status.enum';
 import { WorkType } from '../enums/work-type.enum';
+import {
+  JobExpiredError,
+  JobNotActiveError,
+  JobNotAllowedError,
+} from '../errors';
 
 export class Job {
   constructor(
@@ -53,5 +58,30 @@ export class Job {
       params.deletedAt ?? undefined,
       params.companyProfile ?? undefined,
     );
+  }
+
+  isOpenForApplications(): boolean {
+    if (this.status !== JobStatus.ACTIVE) return false;
+    if (this.expiresAt && this.expiresAt < new Date()) return false;
+    return true;
+  }
+
+  assertCanAcceptApplication(): void {
+    if (this.status !== JobStatus.ACTIVE) {
+      throw new JobNotActiveError();
+    }
+    if (this.expiresAt && this.expiresAt < new Date()) {
+      throw new JobExpiredError();
+    }
+  }
+
+  assertOwnedBy(companyProfileId: string): void {
+    if (this.companyProfileId !== companyProfileId) {
+      throw new JobNotAllowedError();
+    }
+  }
+
+  isExpired(): boolean {
+    return !!this.expiresAt && this.expiresAt < new Date();
   }
 }

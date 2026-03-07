@@ -1,10 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { GetPublicUrlUseCase } from 'src/modules/file-uploader/application/use-cases/get-public-url.use-case';
 import { CompanyProfile } from '../../domain/entities/company-profile.entity';
-import {
-  CompanyProfileNotAllowedError,
-  CompanyProfileNotFoundError,
-} from '../../domain/errors';
+import { CompanyProfileNotFoundError } from '../../domain/errors';
 import { UpdateCompanyProfileCommand } from '../dtos/update-company-profile.command';
 import { CompanyRepository } from '../repositories/company.repository';
 
@@ -23,9 +20,7 @@ export class UpdateCompanyProfileUseCase {
       throw new CompanyProfileNotFoundError();
     }
 
-    if (existing.userId !== command.userId) {
-      throw new CompanyProfileNotAllowedError();
-    }
+    existing.assertOwnedBy(command.userId);
 
     const logoUrl = command.logoUrl
       ? this.getPublicUrlUseCase.execute(command.logoUrl)

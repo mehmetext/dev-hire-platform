@@ -1,5 +1,5 @@
-import { Inject, UnauthorizedException } from '@nestjs/common';
-import { CandidateCVNotFoundError } from 'src/modules/job/domain/errors';
+import { Inject } from '@nestjs/common';
+import { CandidateCVNotFoundError } from '../../domain/errors';
 import { CandidateRepository } from '../repositories/candidate.repository';
 
 export class DeleteCandidateCvUseCase {
@@ -18,9 +18,7 @@ export class DeleteCandidateCvUseCase {
       throw new CandidateCVNotFoundError();
     }
 
-    if (existing.candidateProfileId !== params.candidateProfileId) {
-      throw new UnauthorizedException('You are not allowed to delete this CV');
-    }
+    existing.assertBelongsTo(params.candidateProfileId);
 
     await this.candidateRepository.deleteCv(params.id);
   }

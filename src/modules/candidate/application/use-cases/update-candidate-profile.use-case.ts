@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CandidateProfile } from '../../domain/entities/candidate-profile.entity';
-import {
-  CandidateProfileNotAllowedError,
-  CandidateProfileNotFoundError,
-} from '../../domain/errors';
+import { CandidateProfileNotFoundError } from '../../domain/errors';
 import { UpdateCandidateProfileCommand } from '../dtos/update-candidate-profile.command';
 import { CandidateRepository } from '../repositories/candidate.repository';
 
@@ -22,9 +19,7 @@ export class UpdateCandidateProfileUseCase {
       throw new CandidateProfileNotFoundError();
     }
 
-    if (existing.userId !== command.userId) {
-      throw new CandidateProfileNotAllowedError();
-    }
+    existing.assertOwnedBy(command.userId);
 
     const updated = CandidateProfile.create({
       id: existing.id,

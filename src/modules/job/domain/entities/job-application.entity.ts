@@ -1,6 +1,7 @@
 import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.entity';
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { JobApplicationStatus } from '../enums/job-application-status.enum';
+import { JobApplicationNotPendingError } from '../errors';
 import { Job } from './job.entity';
 
 export class JobApplication {
@@ -45,5 +46,11 @@ export class JobApplication {
 
   isDeleted(): boolean {
     return !!this.deletedAt;
+  }
+
+  assertCanWithdraw(): void {
+    if (this.status !== JobApplicationStatus.PENDING) {
+      throw new JobApplicationNotPendingError();
+    }
   }
 }
