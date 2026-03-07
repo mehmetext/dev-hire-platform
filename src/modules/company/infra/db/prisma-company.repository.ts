@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
+import { getPrismaClient } from 'src/shared/modules/unit-of-work/infra/get-prisma-client';
 import { CompanyRepository } from '../../application/repositories/company.repository';
 import { CompanyProfile } from '../../domain/entities/company-profile.entity';
 import { PrismaCompanyMapper } from './prisma-company.mapper';
@@ -13,7 +14,7 @@ export class PrismaCompanyRepository implements CompanyRepository {
     companyProfile: CompanyProfile,
     options?: { tx?: TransactionContext },
   ): Promise<CompanyProfile> {
-    const client = (options?.tx ?? this.prisma) as PrismaService;
+    const client = getPrismaClient(options?.tx, this.prisma);
 
     const created = await client.companyProfile.create({
       data: PrismaCompanyMapper.toCreatePersistence(companyProfile),
@@ -33,7 +34,7 @@ export class PrismaCompanyRepository implements CompanyRepository {
     companyProfile: CompanyProfile,
     options?: { tx?: TransactionContext },
   ): Promise<CompanyProfile> {
-    const client = (options?.tx ?? this.prisma) as PrismaService;
+    const client = getPrismaClient(options?.tx, this.prisma);
 
     const updated = await client.companyProfile.update({
       where: { id: companyProfile.id },

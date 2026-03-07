@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
+import { getPrismaClient } from 'src/shared/modules/unit-of-work/infra/get-prisma-client';
 import { CreateUserCommand } from '../../application/dtos/create-user.command';
 import { UserRepository } from '../../application/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
@@ -17,7 +18,7 @@ export class PrismaUserRepository implements UserRepository {
     command: CreateUserCommand,
     options?: { tx?: TransactionContext },
   ): Promise<User> {
-    const client = (options?.tx ?? this.prisma) as PrismaService;
+    const client = getPrismaClient(options?.tx, this.prisma);
 
     const hashedPassword = await bcrypt.hash(command.password, 10);
 
@@ -38,7 +39,7 @@ export class PrismaUserRepository implements UserRepository {
     email: EmailVO,
     options?: { tx?: TransactionContext },
   ): Promise<User | null> {
-    const client = (options?.tx ?? this.prisma) as PrismaService;
+    const client = getPrismaClient(options?.tx, this.prisma);
 
     const user = await client.user.findUnique({
       where: { email: email.value },

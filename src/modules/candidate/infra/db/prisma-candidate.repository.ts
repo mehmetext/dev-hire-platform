@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
+import { getPrismaClient } from 'src/shared/modules/unit-of-work/infra/get-prisma-client';
 import { CandidateRepository } from '../../application/repositories/candidate.repository';
 import { CandidateCV } from '../../domain/entities/candidate-cv.entity';
 import { CandidateProfile } from '../../domain/entities/candidate-profile.entity';
@@ -15,7 +16,7 @@ export class PrismaCandidateRepository implements CandidateRepository {
     candidateProfile: CandidateProfile,
     options?: { tx?: TransactionContext },
   ): Promise<CandidateProfile> {
-    const client = (options?.tx ?? this.prisma) as PrismaService;
+    const client = getPrismaClient(options?.tx, this.prisma);
 
     const created = await client.candidateProfile.create({
       data: PrismaCandidateMapper.toCreatePersistence(candidateProfile),
