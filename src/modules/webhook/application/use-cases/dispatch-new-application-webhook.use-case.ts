@@ -1,12 +1,11 @@
-import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
 import { WebhookDeliveryStatus } from '../../domain/enums/webhook-delivery-status.enum';
 import { CompanyWebhookNotFoundError } from '../../domain/errors';
 import { CreateWebhookDeliveryCommand } from '../dtos/create-webhook-delivery.command';
 import { DispatchNewApplicationWebhookCommand } from '../dtos/dispatch-new-application-webhook.command';
 import { CompanyWebhookRepository } from '../repositories/company-webhook.repository';
 import { WebhookDeliveryRepository } from '../repositories/webhook-delivery.repository';
+import { WebhookSenderRepository } from '../repositories/webhook-sender.repository';
 
 @Injectable()
 export class DispatchNewApplicationWebhookUseCase {
@@ -17,8 +16,8 @@ export class DispatchNewApplicationWebhookUseCase {
     private readonly companyWebhookRepository: CompanyWebhookRepository,
     @Inject(WebhookDeliveryRepository)
     private readonly webhookDeliveryRepository: WebhookDeliveryRepository,
-    @Inject(HttpService)
-    private readonly httpService: HttpService,
+    @Inject(WebhookSenderRepository)
+    private readonly webhookSenderRepository: WebhookSenderRepository,
   ) {}
 
   async execute(command: DispatchNewApplicationWebhookCommand): Promise<void> {
@@ -45,13 +44,9 @@ export class DispatchNewApplicationWebhookUseCase {
     };
 
     try {
-      const response = await firstValueFrom(
-        this.httpService.post(webhook.webhook.webhookUrl, payload, {
-          timeout: 15000,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }),
+      const response = await this.webhookSenderRepository.sendWebhook(
+        webhook.webhook.webhookUrl,
+        payload,
       );
 
       if (response.status >= 200 && response.status < 300) {
