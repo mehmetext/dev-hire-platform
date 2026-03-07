@@ -186,21 +186,19 @@ export class JobController {
     });
   }
 
-  @Put(':jobId/applications/:candidateProfileId/status')
+  @Put('applications/:applicationId/status')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiNoContentResponse()
   updateJobApplicationStatusByCompany(
-    @Param('jobId') jobId: string,
-    @Param('candidateProfileId') candidateProfileId: string,
+    @Param('applicationId') applicationId: string,
     @Body()
     updateJobApplicationStatusByCompanyDto: UpdateJobApplicationStatusByCompanyDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
     return this.updateJobApplicationStatusByCompanyUseCase.execute({
-      jobId,
+      applicationId,
       companyProfileId: req.user.companyProfile!.id,
-      candidateProfileId,
       status: updateJobApplicationStatusByCompanyDto.status,
     });
   }

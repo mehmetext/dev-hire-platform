@@ -15,17 +15,15 @@ export class UpdateJobApplicationStatusByCompanyUseCase {
   async execute(
     command: UpdateJobApplicationStatusByCompanyCommand,
   ): Promise<void> {
-    const jobApplication =
-      await this.jobRepository.findApplicationByJobIdAndCandidateProfileId(
-        command.jobId,
-        command.candidateProfileId,
-      );
+    const jobApplication = await this.jobRepository.findApplicationById(
+      command.applicationId,
+    );
 
     if (!jobApplication) {
       throw new JobApplicationNotFoundError();
     }
 
-    const job = await this.jobRepository.findById(command.jobId);
+    const job = await this.jobRepository.findById(jobApplication.jobId);
 
     if (!job) {
       throw new JobNotFoundError();

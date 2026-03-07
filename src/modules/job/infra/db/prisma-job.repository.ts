@@ -57,6 +57,25 @@ export class PrismaJobRepository implements JobRepository {
     if (!jobApplication) return null;
 
     return JobApplication.create({
+      id: jobApplication.id,
+      jobId: jobApplication.jobId,
+      candidateProfileId: jobApplication.candidateProfileId,
+      candidateCVId: jobApplication.candidateCVId,
+      status: jobApplication.status,
+      createdAt: jobApplication.createdAt,
+      updatedAt: jobApplication.updatedAt,
+      deletedAt: jobApplication.deletedAt ?? undefined,
+    });
+  }
+
+  async findApplicationById(id: string): Promise<JobApplication | null> {
+    const jobApplication = await this.prisma.jobApplication.findUnique({
+      where: { id },
+    });
+    if (!jobApplication) return null;
+
+    return JobApplication.create({
+      id: jobApplication.id,
       jobId: jobApplication.jobId,
       candidateProfileId: jobApplication.candidateProfileId,
       candidateCVId: jobApplication.candidateCVId,
@@ -222,6 +241,7 @@ export class PrismaJobRepository implements JobRepository {
 
     return jobApplications.map((jobApplication) =>
       JobApplication.create({
+        id: jobApplication.id,
         jobId: jobApplication.jobId,
         candidateProfileId: jobApplication.candidateProfileId,
         candidateCVId: jobApplication.candidateCVId,
@@ -266,12 +286,7 @@ export class PrismaJobRepository implements JobRepository {
     command: UpdateJobApplicationStatusByCompanyCommand,
   ): Promise<void> {
     await this.prisma.jobApplication.update({
-      where: {
-        jobId_candidateProfileId: {
-          jobId: command.jobId,
-          candidateProfileId: command.candidateProfileId,
-        },
-      },
+      where: { id: command.applicationId },
       data: { status: command.status },
     });
   }
@@ -292,6 +307,7 @@ export class PrismaJobRepository implements JobRepository {
     });
     return jobApplications.map((jobApplication) =>
       JobApplication.create({
+        id: jobApplication.id,
         jobId: jobApplication.jobId,
         candidateProfileId: jobApplication.candidateProfileId,
         candidateCVId: jobApplication.candidateCVId,

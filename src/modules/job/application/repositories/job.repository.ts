@@ -20,6 +20,7 @@ export abstract class JobRepository {
     jobId: string,
     candidateProfileId: string,
   ): Promise<JobApplication | null>;
+  abstract findApplicationById(id: string): Promise<JobApplication | null>;
   abstract findAllJobApplicationsByJobId(
     jobId: string,
   ): Promise<JobApplication[]>;

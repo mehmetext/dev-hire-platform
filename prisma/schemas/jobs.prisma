@@ -25,6 +25,7 @@ model Job {
   status           JobStatus        @map("status")
   expiresAt        DateTime?        @map("expires_at")
   jobApplications  JobApplication[]
+  jobQuestions     JobQuestion[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -43,6 +44,7 @@ enum JobApplicationStatus {
 }
 
 model JobApplication {
+  id    String @id @default(uuid())
   jobId String
   job   Job    @relation(fields: [jobId], references: [id])
 
@@ -51,7 +53,8 @@ model JobApplication {
   candidateCVId      String
   candidateCV        CandidateCV      @relation(fields: [candidateCVId], references: [id])
 
-  status JobApplicationStatus @default(PENDING) @map("status")
+  status             JobApplicationStatus @default(PENDING) @map("status")
+  jobQuestionAnswers JobQuestionAnswers[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -59,4 +62,38 @@ model JobApplication {
 
   @@unique([jobId, candidateProfileId])
   @@map("job_applications")
+}
+
+enum QuestionType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  BOOLEAN
+}
+
+model JobQuestion {
+  id    String @id @default(uuid())
+  jobId String @map("job_id")
+  job   Job    @relation(fields: [jobId], references: [id])
+
+  question           String
+  questionType       QuestionType
+  isRequired         Boolean              @default(true) @map("is_required")
+  sortOrder          Int                  @default(0) @map("sort_order")
+  jobQuestionAnswers JobQuestionAnswers[]
+
+  @@map("job_questions")
+}
+
+model JobQuestionAnswers {
+  id            String      @id @default(uuid())
+  jobQuestionId String
+  jobQuestion   JobQuestion @relation(fields: [jobQuestionId], references: [id])
+
+  jobApplicationId String
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
+
+  answer String
+
+  @@map("job_question_answers")
 }

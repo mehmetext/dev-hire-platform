@@ -2,9 +2,8 @@ import { JobApplicationStatus } from '../../domain/enums/job-application-status.
 
 export class UpdateJobApplicationStatusByCompanyCommand {
   constructor(
-    public readonly jobId: string,
+    public readonly applicationId: string,
     public readonly companyProfileId: string,
-    public readonly candidateProfileId: string,
     public readonly status: JobApplicationStatus,
   ) {}
 }

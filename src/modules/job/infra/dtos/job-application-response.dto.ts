@@ -6,6 +6,12 @@ import { JobResponseDto } from './job-response.dto';
 
 export class JobApplicationResponseDto {
   @ApiProperty({
+    description: 'The ID of the job application',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  id: string;
+
+  @ApiProperty({
     description: 'The ID of the job',
     example: '123',
   })

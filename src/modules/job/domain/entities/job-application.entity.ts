@@ -6,6 +6,7 @@ import { Job } from './job.entity';
 
 export class JobApplication {
   constructor(
+    public readonly id: string,
     public readonly jobId: string,
     public readonly candidateProfileId: string,
     public readonly candidateCVId: string,
@@ -19,6 +20,7 @@ export class JobApplication {
   ) {}
 
   static create(params: {
+    id: string;
     jobId: string;
     candidateProfileId: string;
     candidateCVId: string;
@@ -31,6 +33,7 @@ export class JobApplication {
     candidateCV?: CandidateCV | undefined;
   }): JobApplication {
     return new JobApplication(
+      params.id,
       params.jobId,
       params.candidateProfileId,
       params.candidateCVId,
