@@ -1,11 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { TransactionContext } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { CreateUserCommand } from '../../application/dtos/create-user.command';
 import { UserRepository } from '../../application/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
-import { UserNotFoundError } from '../../domain/errors';
+import { UserAlreadyExistsError, UserNotFoundError } from '../../domain/errors';
 import { EmailVO } from '../../domain/value-objects/email.vo';
 import { PrismaUserMapper } from './prisma-user.mapper';
 
@@ -22,7 +22,7 @@ export class PrismaUserRepository implements UserRepository {
     const existingUser = await this.findByEmail(command.email);
 
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new UserAlreadyExistsError();
     }
 
     const hashedPassword = await bcrypt.hash(command.password, 10);
