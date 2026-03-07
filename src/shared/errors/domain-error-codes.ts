@@ -22,6 +22,7 @@ export const DOMAIN_ERROR_CODES = [
   'COMPANY_WEBHOOK_NOT_ALLOWED',
   'DUPLICATE_COMPANY_WEBHOOK',
   'INVALID_TOKEN',
+  'INVALID_FILE_UPLOAD_TYPE',
 ] as const;
 
 export type DomainErrorCode = (typeof DOMAIN_ERROR_CODES)[number];
