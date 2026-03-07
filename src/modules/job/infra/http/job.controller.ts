@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,6 +17,8 @@ import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
+import { RequireCandidateProfileGuard } from 'src/shared/guards/require-candidate-profile.guard';
+import { RequireCompanyProfileGuard } from 'src/shared/guards/require-company-profile.guard';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
@@ -74,72 +75,56 @@ export class JobController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), JobsLimitGuard)
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard, JobsLimitGuard)
   @ApiCreatedResponseGeneric(JobResponseDto)
   async createJob(
     @Body() createJobDto: CreateJobDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
-
     return this.createJobUseCase.execute({
       ...createJobDto,
-      companyProfileId: req.user.companyProfile.id,
+      companyProfileId: req.user.companyProfile!.id,
     });
   }
 
   @Post(':id/apply')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiNoContentResponse()
   async applyJob(
     @Param('id') id: string,
     @Body() applyJobDto: ApplyJobDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.applyJobUseCase.execute({
       jobId: id,
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
       candidateCVId: applyJobDto.candidateCVId,
     });
   }
 
   @Delete(':id/withdraw')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiNoContentResponse()
   async withdrawJob(
     @Param('id') id: string,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.withdrawJobUseCase.execute({
       jobId: id,
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
     });
   }
 
   @Get('owned')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiOkResponseGeneric(JobResponseWithoutCompanyDto, {
     isArray: true,
   })
   getOwnedJobs(@Req() req: Request & { user: UserResponseDto }) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
-
-    return this.getOwnedJobsUseCase.execute(req.user.companyProfile.id);
+    return this.getOwnedJobsUseCase.execute(req.user.companyProfile!.id);
   }
 
   @Get(':id')
@@ -160,41 +145,34 @@ export class JobController {
 
   @Put(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiOkResponseGeneric(JobResponseDto)
   updateJob(
     @Param('id') id: string,
     @Body() updateJobDto: UpdateJobDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
-
     return this.updateJobUseCase.execute({
       id,
-      companyProfileId: req.user.companyProfile.id,
+      companyProfileId: req.user.companyProfile!.id,
       ...updateJobDto,
     });
   }
 
   @Delete(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiNoContentResponse()
   deleteJob(
     @Param('id') id: string,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
-    return this.deleteJobUseCase.execute(id, req.user.companyProfile.id);
+    return this.deleteJobUseCase.execute(id, req.user.companyProfile!.id);
   }
 
   @Get(':id/applications')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiOkResponseGeneric(JobApplicationResponseWithoutJobDto, {
     isArray: true,
   })
@@ -202,18 +180,15 @@ export class JobController {
     @Param('id') id: string,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
     return this.getJobApplicationsByJobIdUseCase.execute({
       jobId: id,
-      companyProfileId: req.user.companyProfile.id,
+      companyProfileId: req.user.companyProfile!.id,
     });
   }
 
   @Put(':jobId/applications/:candidateProfileId/status')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
   @ApiNoContentResponse()
   updateJobApplicationStatusByCompany(
     @Param('jobId') jobId: string,
@@ -222,13 +197,9 @@ export class JobController {
     updateJobApplicationStatusByCompanyDto: UpdateJobApplicationStatusByCompanyDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.companyProfile?.id) {
-      throw new UnauthorizedException('Company profile not found');
-    }
-
     return this.updateJobApplicationStatusByCompanyUseCase.execute({
       jobId,
-      companyProfileId: req.user.companyProfile.id,
+      companyProfileId: req.user.companyProfile!.id,
       candidateProfileId,
       status: updateJobApplicationStatusByCompanyDto.status,
     });
@@ -236,17 +207,13 @@ export class JobController {
 
   @Get('applications/owned')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiOkResponseGeneric(JobApplicationResponseWithoutCandidateDto, {
     isArray: true,
   })
   getOwnedJobApplications(@Req() req: Request & { user: UserResponseDto }) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.getOwnedJobApplicationsUseCase.execute({
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
     });
   }
 }

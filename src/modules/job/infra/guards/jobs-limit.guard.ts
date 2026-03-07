@@ -3,7 +3,6 @@ import {
   ExecutionContext,
   ForbiddenException,
   Inject,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { SubscriptionLimitService } from 'src/modules/subscription/application/subscription-limit.service';
@@ -20,10 +19,7 @@ export class JobsLimitGuard implements CanActivate {
       .switchToHttp()
       .getRequest<Request & { user: UserResponseDto }>();
 
-    const companyProfile = request.user.companyProfile;
-    if (!companyProfile) {
-      throw new UnauthorizedException('Company profile not found');
-    }
+    const companyProfile = request.user.companyProfile!;
 
     const maxJobs = this.subscriptionLimitService.getMaxJobsForPlan(
       companyProfile.subscriptionPlan,

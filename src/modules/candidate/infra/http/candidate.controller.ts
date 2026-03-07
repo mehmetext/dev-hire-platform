@@ -9,7 +9,6 @@ import {
   Post,
   Put,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,13 +17,13 @@ import { Request } from 'express';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
+import { RequireCandidateProfileGuard } from 'src/shared/guards/require-candidate-profile.guard';
 import { UpdateCandidateProfileCommand } from '../../application/dtos/update-candidate-profile.command';
 import { CreateCandidateCvUseCase } from '../../application/use-cases/create-candidate-cv.use-case';
 import { DeleteCandidateCvUseCase } from '../../application/use-cases/delete-candidate-cv.use-case';
 import { GetCvsByCandidateIdUseCase } from '../../application/use-cases/get-cvs-by-candidate-id.use-case';
 import { UpdateCandidateCvUseCase } from '../../application/use-cases/update-candidate-cv.use-case';
 import { UpdateCandidateProfileUseCase } from '../../application/use-cases/update-candidate-profile.use-case';
-import { CandidateProfileNotFoundError } from '../../domain/errors';
 import { CandidateCvResponseDto } from '../dtos/candidate-cv-resposne.dto';
 import { CandidateResponseDto } from '../dtos/candidate-response.dto';
 import { CreateCandidateCvDto } from '../dtos/create-candidate-cv.dto';
@@ -48,17 +47,13 @@ export class CandidateController {
 
   @Patch('profile')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiOkResponseGeneric(CandidateResponseDto)
   async updateProfile(
     @Body() updateCandidateProfileDto: UpdateCandidateProfileDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new CandidateProfileNotFoundError();
-    }
-
-    const id = req.user.candidateProfile.id;
+    const id = req.user.candidateProfile!.id;
 
     return this.updateCandidateProfileUseCase.execute(
       new UpdateCandidateProfileCommand(
@@ -72,32 +67,24 @@ export class CandidateController {
 
   @Get('cvs')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiOkResponseGeneric(CandidateCvResponseDto, { isArray: true })
   async getCvsByCandidateId(@Req() req: Request & { user: UserResponseDto }) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.getCvsByCandidateIdUseCase.execute(
-      req.user.candidateProfile.id,
+      req.user.candidateProfile!.id,
     );
   }
 
   @Post('cvs')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiCreatedResponseGeneric(CandidateCvResponseDto)
   async createCv(
     @Body() createCandidateCvDto: CreateCandidateCvDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.createCandidateCvUseCase.execute({
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
       title: createCandidateCvDto.title,
       url: createCandidateCvDto.url,
     });
@@ -105,20 +92,16 @@ export class CandidateController {
 
   @Put('cvs/:id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiOkResponseGeneric(CandidateCvResponseDto)
   async updateCv(
     @Param('id') id: string,
     @Body() updateCandidateCvDto: UpdateCandidateCvDto,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     return this.updateCandidateCvUseCase.execute({
       id,
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
       title: updateCandidateCvDto.title,
       url: updateCandidateCvDto.url,
     });
@@ -126,19 +109,15 @@ export class CandidateController {
 
   @Delete('cvs/:id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RequireCandidateProfileGuard)
   @ApiNoContentResponse()
   async deleteCv(
     @Param('id') id: string,
     @Req() req: Request & { user: UserResponseDto },
   ) {
-    if (!req.user.candidateProfile?.id) {
-      throw new UnauthorizedException('Candidate profile not found');
-    }
-
     await this.deleteCandidateCvUseCase.execute({
       id,
-      candidateProfileId: req.user.candidateProfile.id,
+      candidateProfileId: req.user.candidateProfile!.id,
     });
   }
 }
