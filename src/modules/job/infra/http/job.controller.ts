@@ -24,7 +24,6 @@ import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case'
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
-import { GetJobByIdUseCase } from '../../application/use-cases/get-job-by-id.use-case';
 import { GetJobDetailsByIdUseCase } from '../../application/use-cases/get-job-details-by-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { GetOwnedJobApplicationsUseCase } from '../../application/use-cases/get-owned-job-applications.use-case';
@@ -52,8 +51,8 @@ export class JobController {
   constructor(
     @Inject(CreateJobUseCase)
     private readonly createJobUseCase: CreateJobUseCase,
-    @Inject(GetJobByIdUseCase)
-    private readonly getJobByIdUseCase: GetJobByIdUseCase,
+    @Inject(GetJobDetailsByIdUseCase)
+    private readonly getJobDetailsByIdUseCase: GetJobDetailsByIdUseCase,
     @Inject(GetJobsUseCase)
     private readonly getJobsUseCase: GetJobsUseCase,
     @Inject(UpdateJobUseCase)
@@ -72,8 +71,6 @@ export class JobController {
     private readonly updateJobApplicationStatusByCompanyUseCase: UpdateJobApplicationStatusByCompanyUseCase,
     @Inject(GetOwnedJobApplicationsUseCase)
     private readonly getOwnedJobApplicationsUseCase: GetOwnedJobApplicationsUseCase,
-    @Inject(GetJobDetailsByIdUseCase)
-    private readonly getJobDetailsByIdUseCase: GetJobDetailsByIdUseCase,
   ) {}
 
   @Post()
@@ -135,7 +132,7 @@ export class JobController {
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponseGeneric(JobResponseDto)
   getJobById(@Param('id') id: string) {
-    return this.getJobByIdUseCase.execute(id);
+    return this.getJobDetailsByIdUseCase.execute(id);
   }
 
   @Get()
@@ -216,13 +213,5 @@ export class JobController {
     return this.getOwnedJobApplicationsUseCase.execute({
       candidateProfileId: req.user.candidateProfile!.id,
     });
-  }
-
-  @Get(':id/details')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @ApiOkResponseGeneric(JobResponseDto)
-  getJobDetailsById(@Param('id') id: string) {
-    return this.getJobDetailsByIdUseCase.execute(id);
   }
 }

@@ -8,7 +8,6 @@ import { CloseExpiredJobsUseCase } from '../application/use-cases/close-expired-
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../application/use-cases/get-job-applications-by-job-id-use-case';
-import { GetJobByIdUseCase } from '../application/use-cases/get-job-by-id.use-case';
 import { GetJobDetailsByIdUseCase } from '../application/use-cases/get-job-details-by-id.use-case';
 import { GetJobsUseCase } from '../application/use-cases/get-jobs.use-case';
 import { GetOwnedJobApplicationsUseCase } from '../application/use-cases/get-owned-job-applications.use-case';
@@ -33,7 +32,6 @@ import { CloseExpiredJobsCron } from './scheduler/close-expired-jobs.cron';
     CreateJobUseCase,
     UpdateJobUseCase,
     DeleteJobUseCase,
-    GetJobByIdUseCase,
     GetJobsUseCase,
     GetOwnedJobsUseCase,
     ApplyJobUseCase,

@@ -13,6 +13,7 @@ import { UpdateJobCommand } from '../../application/dtos/update-job.command';
 import { WithdrawJobCommand } from '../../application/dtos/withdraw-job.command';
 import { JobRepository } from '../../application/repositories/job.repository';
 import { JobApplication } from '../../domain/entities/job-application.entity';
+import { JobQuestion } from '../../domain/entities/job-question.entity';
 import { Job } from '../../domain/entities/job.entity';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import { JobNotFoundError } from '../../domain/errors';
@@ -178,8 +179,35 @@ export class PrismaJobRepository implements JobRepository {
       deletedAt: undefined,
     });
 
+    const jobQuestions = command.jobQuestions.map((jobQuestion) =>
+      JobQuestion.create({
+        id: randomUUID(),
+        jobId: job.id,
+        question: jobQuestion.question,
+        questionType: jobQuestion.questionType,
+        isRequired: jobQuestion.isRequired,
+        sortOrder: jobQuestion.sortOrder,
+      }),
+    );
+
     const created = await this.prisma.job.create({
-      data: PrismaJobMapper.toCreatePersistence(job),
+      data: {
+        ...PrismaJobMapper.toCreatePersistence(job),
+        jobQuestions: {
+          createMany: {
+            data: jobQuestions.map((jobQuestion) => ({
+              question: jobQuestion.question,
+              questionType: jobQuestion.questionType,
+              isRequired: jobQuestion.isRequired,
+              sortOrder: jobQuestion.sortOrder,
+            })),
+          },
+        },
+      },
+      include: {
+        jobQuestions: true,
+        companyProfile: true,
+      },
     });
 
     return PrismaJobMapper.toDomain(created);

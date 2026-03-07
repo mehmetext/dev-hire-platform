@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import { WorkType } from '../../domain/enums/work-type.enum';
+import { CreateJobQuestionDto } from './create-job-question.dto';
 
 export class CreateJobDto {
   @IsString()
@@ -66,4 +67,12 @@ export class CreateJobDto {
     example: new Date(),
   })
   expiresAt: Date;
+
+  @IsArray()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The job questions of the job',
+    type: () => [CreateJobQuestionDto],
+  })
+  jobQuestions: CreateJobQuestionDto[];
 }
