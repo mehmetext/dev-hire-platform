@@ -29,6 +29,7 @@ model WebhookDelivery {
 
   webhookId String
   webhook   Webhook @relation(fields: [webhookId], references: [id])
+  eventType String
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

@@ -23,21 +23,12 @@ model CompanyProfile {
   @@map("company_profiles")
 }
 
-enum CompanyWebhookEventType {
-  JOB_APPLICATION_CREATED
-  JOB_APPLICATION_UPDATED
-  JOB_APPLICATION_DELETED
-  JOB_APPLICATION_STATUS_CHANGED
-}
-
 model CompanyWebhook {
   companyProfileId String
   companyProfile   CompanyProfile @relation(fields: [companyProfileId], references: [id])
 
   webhookId String
   webhook   Webhook @relation(fields: [webhookId], references: [id])
-
-  eventType CompanyWebhookEventType @map("event_type")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
