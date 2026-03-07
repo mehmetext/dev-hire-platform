@@ -8,7 +8,6 @@ import {
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { SubscriptionLimitService } from 'src/modules/subscription/application/subscription-limit.service';
 import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
-import { subscriptionPlans } from 'src/shared/constants/subscriptions';
 
 export class JobsLimitGuard implements CanActivate {
   constructor(
@@ -26,7 +25,9 @@ export class JobsLimitGuard implements CanActivate {
       throw new UnauthorizedException('Company profile not found');
     }
 
-    const maxJobs = subscriptionPlans[companyProfile.subscriptionPlan].maxJobs;
+    const maxJobs = this.subscriptionLimitService.getMaxJobsForPlan(
+      companyProfile.subscriptionPlan,
+    );
 
     const canCreateJob = await this.subscriptionLimitService.canCreateJob(
       CompanyProfile.create({

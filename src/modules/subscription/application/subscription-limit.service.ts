@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
+import { SubscriptionPlan } from 'src/modules/company/domain/enums/subscription-plan.enum';
 import { JobRepository } from 'src/modules/job/application/repositories/job.repository';
-import { subscriptionPlans } from 'src/shared/constants/subscriptions';
+import { subscriptionPlans } from 'src/modules/subscription/application/constants/subscriptions';
 
 @Injectable()
 export class SubscriptionLimitService {
@@ -36,5 +37,15 @@ export class SubscriptionLimitService {
     );
 
     return Math.max(0, planConfig.maxJobs - currentJobsCount);
+  }
+
+  getMaxJobsForPlan(plan: SubscriptionPlan): number {
+    const planConfig = subscriptionPlans[plan];
+
+    if (!planConfig) {
+      return 0;
+    }
+
+    return planConfig.maxJobs;
   }
 }
