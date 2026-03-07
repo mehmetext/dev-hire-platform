@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/shared/modules/prisma/prisma.module';
 import { CompanyWebhookRepository } from '../application/repositories/company-webhook.repository';
@@ -8,7 +9,7 @@ import { RegisterCompanyWebhookUseCase } from '../application/use-cases/register
 import { PrismaCompanyWebhookRepository } from './db/prisma-company-webhook.repository';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, HttpModule],
   providers: [
     {
       provide: CompanyWebhookRepository,
