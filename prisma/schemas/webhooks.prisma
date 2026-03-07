@@ -21,11 +21,10 @@ enum WebhookDeliveryStatus {
 }
 
 model WebhookDelivery {
-  id           String                @id @default(uuid())
-  payload      Json                  @map("payload")
-  status       WebhookDeliveryStatus @map("status")
-  attemptCount Int                   @default(0) @map("attempt_count")
-  nextRetryAt  DateTime?             @map("next_retry_at")
+  id          String                @id @default(uuid())
+  payload     Json                  @map("payload")
+  status      WebhookDeliveryStatus @map("status")
+  nextRetryAt DateTime?             @map("next_retry_at")
 
   webhookId String
   webhook   Webhook @relation(fields: [webhookId], references: [id])
