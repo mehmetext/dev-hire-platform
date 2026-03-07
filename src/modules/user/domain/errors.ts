@@ -1,26 +1,25 @@
 import { DomainError } from 'src/shared/errors/domain.error';
-import { StatusCode } from 'src/shared/constants/http-response-codes';
 
 export class UserAlreadyExistsError extends DomainError {
   constructor(message = 'User already exists') {
-    super(message, StatusCode.CONFLICT);
+    super(message, 'USER_ALREADY_EXISTS');
   }
 }
 
 export class UserNotFoundError extends DomainError {
   constructor(message = 'User not found') {
-    super(message, StatusCode.NOT_FOUND);
+    super(message, 'USER_NOT_FOUND');
   }
 }
 
 export class UserInvalidCredentialsError extends DomainError {
   constructor(message = 'Invalid credentials') {
-    super(message, StatusCode.UNAUTHORIZED);
+    super(message, 'INVALID_CREDENTIALS');
   }
 }
 
 export class InvalidEmailError extends DomainError {
   constructor(message = 'Invalid email') {
-    super(message, StatusCode.BAD_REQUEST);
+    super(message, 'INVALID_EMAIL');
   }
 }
