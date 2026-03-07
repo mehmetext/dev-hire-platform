@@ -34,4 +34,5 @@ export abstract class JobRepository {
   abstract findAllOwnedJobApplications(
     command: GetOwnedJobApplicationsCommand,
   ): Promise<JobApplication[]>;
+  abstract closeExpiredJobs(): Promise<void>;
 }

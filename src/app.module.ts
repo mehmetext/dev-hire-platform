@@ -3,6 +3,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import Keyv from 'keyv';
 import { AppController } from './app.controller';
@@ -56,6 +57,7 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
     JobModule,
     CandidateModule,
     FileUploaderModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

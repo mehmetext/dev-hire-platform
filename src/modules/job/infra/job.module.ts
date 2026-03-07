@@ -4,6 +4,7 @@ import { SubscriptionModule } from 'src/modules/subscription/infra/subscription.
 import { QueueModule } from 'src/shared/modules/queue/infra/queue.module';
 import { JobRepository } from '../application/repositories/job.repository';
 import { ApplyJobUseCase } from '../application/use-cases/apply-job.use-case';
+import { CloseExpiredJobsUseCase } from '../application/use-cases/close-expired-jobs.use-case';
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../application/use-cases/get-job-applications-by-job-id-use-case';
@@ -16,6 +17,7 @@ import { UpdateJobUseCase } from '../application/use-cases/update-job.use-case';
 import { WithdrawJobUseCase } from '../application/use-cases/withdraw-job.use-case';
 import { PrismaJobRepository } from './db/prisma-job.repository';
 import { JobController } from './http/job.controller';
+import { CloseExpiredJobsCron } from './scheduler/close-expired-jobs.cron';
 
 @Module({
   controllers: [JobController],
@@ -25,6 +27,8 @@ import { JobController } from './http/job.controller';
       provide: JobRepository,
       useClass: PrismaJobRepository,
     },
+    CloseExpiredJobsCron,
+    CloseExpiredJobsUseCase,
     CreateJobUseCase,
     UpdateJobUseCase,
     DeleteJobUseCase,

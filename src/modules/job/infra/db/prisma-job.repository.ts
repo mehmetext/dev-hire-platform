@@ -370,4 +370,11 @@ export class PrismaJobRepository implements JobRepository {
       }),
     );
   }
+
+  async closeExpiredJobs(): Promise<void> {
+    await this.prisma.job.updateMany({
+      where: { expiresAt: { lt: new Date() } },
+      data: { status: JobStatus.INACTIVE },
+    });
+  }
 }
