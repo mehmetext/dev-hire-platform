@@ -1,5 +1,5 @@
-import { WorkType } from 'src/generated/prisma/enums';
 import { JobStatus } from '../../domain/enums/job-status.enum';
+import { WorkType } from '../../domain/enums/work-type.enum';
 
 export class CreateJobCommand {
   constructor(
