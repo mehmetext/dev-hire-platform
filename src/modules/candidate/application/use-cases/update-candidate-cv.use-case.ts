@@ -1,4 +1,4 @@
-import { Inject, UnauthorizedException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { CandidateCV } from '../../domain/entities/candidate-cv.entity';
 import { CandidateCVNotFoundError } from '../../domain/errors';
 import { CandidateRepository } from '../repositories/candidate.repository';
@@ -21,9 +21,7 @@ export class UpdateCandidateCvUseCase {
       throw new CandidateCVNotFoundError();
     }
 
-    if (existing.candidateProfileId !== params.candidateProfileId) {
-      throw new UnauthorizedException('You are not allowed to update this CV');
-    }
+    existing.assertBelongsTo(params.candidateProfileId);
 
     return this.candidateRepository.updateCv({
       id: params.id,

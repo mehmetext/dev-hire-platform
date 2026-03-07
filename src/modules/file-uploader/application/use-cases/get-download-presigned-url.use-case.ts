@@ -1,5 +1,6 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FileUploadRules } from '../../domain/file-upload-rules';
+import { InvalidFileUploadTypeError } from '../../errors';
 import { GetDownloadPresignedUrlCommand } from '../dtos/get-download-presigned-url.command';
 import { GetDownloadPresignedUrlResult } from '../dtos/get-download-presigned-url.result';
 import { FileUploaderRepository } from '../repositories/file-uploader.repository';
@@ -17,7 +18,7 @@ export class GetDownloadPresignedUrlUseCase {
     const rules = FileUploadRules[command.type];
 
     if (!rules) {
-      throw new BadRequestException('Invalid file upload type.');
+      throw new InvalidFileUploadTypeError();
     }
 
     const url = await this.fileUploaderRepository.getDownloadPresignedUrl({
