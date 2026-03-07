@@ -1,6 +1,10 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import * as mime from 'mime-types';
 import { FileUploadRules } from '../../domain/file-upload-rules';
+import {
+  InvalidFileUploadContentTypeError,
+  InvalidFileUploadTypeError,
+} from '../../errors';
 import { GetUploadPresignedUrlCommand } from '../dtos/get-upload-presigned-url.command';
 import { GetUploadPresignedUrlResult } from '../dtos/get-upload-presigned-url.result';
 import { FileUploaderRepository } from '../repositories/file-uploader.repository';
@@ -18,14 +22,13 @@ export class GetUploadPresignedUrlUseCase {
     const rules = FileUploadRules[command.type];
 
     if (!rules) {
-      throw new BadRequestException('Invalid file upload type.');
+      throw new InvalidFileUploadTypeError();
     }
 
     if (!rules.allowedMimeTypes.includes(command.contentType)) {
-      throw new BadRequestException(
-        `Invalid content type for file upload type ${command.type}. Allowed types: ${rules.allowedMimeTypes.join(
-          ', ',
-        )}`,
+      throw new InvalidFileUploadContentTypeError(
+        command.contentType,
+        rules.allowedMimeTypes,
       );
     }
 

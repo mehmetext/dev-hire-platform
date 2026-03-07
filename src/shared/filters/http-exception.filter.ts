@@ -33,6 +33,7 @@ const DOMAIN_ERROR_CODE_TO_HTTP_STATUS: Record<DomainErrorCode, number> = {
   DUPLICATE_COMPANY_WEBHOOK: 409,
   INVALID_TOKEN: 401,
   INVALID_FILE_UPLOAD_TYPE: 400,
+  INVALID_FILE_UPLOAD_CONTENT_TYPE: 400,
 };
 
 export class HttpExceptionFilter implements ExceptionFilter {
