@@ -12,6 +12,6 @@ import { MockMailRepository } from './mail/mock-mail.repository';
     },
     SendApplicationEmailUseCase,
   ],
-  exports: [],
+  exports: [SendApplicationEmailUseCase],
 })
 export class MailModule {}
