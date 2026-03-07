@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/infra/auth.module';
 import { CandidateModule } from './modules/candidate/infra/candidate.module';
+import { CompanyModule } from './modules/company/infra/company.module';
 import { FileUploaderModule } from './modules/file-uploader/infra/file-uploader.module';
 import { JobModule } from './modules/job/infra/job.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
@@ -54,6 +55,7 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
       ],
     }),
     AuthModule,
+    CompanyModule,
     JobModule,
     CandidateModule,
     FileUploaderModule,
