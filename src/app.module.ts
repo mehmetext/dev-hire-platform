@@ -1,4 +1,5 @@
 import KeyvRedis from '@keyv/redis';
+import { HttpModule } from '@nestjs/axios';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -60,6 +61,7 @@ import { PrismaModule } from './shared/modules/prisma/prisma.module';
     CandidateModule,
     FileUploaderModule,
     ScheduleModule.forRoot(),
+    HttpModule,
   ],
   controllers: [AppController],
   providers: [
