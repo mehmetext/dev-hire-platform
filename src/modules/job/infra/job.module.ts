@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CandidateModule } from 'src/modules/candidate/infra/candidate.module';
+import { SubscriptionModule } from 'src/modules/subscription/infra/subscription.module';
 import { JobRepository } from '../application/repositories/job.repository';
 import { ApplyJobUseCase } from '../application/use-cases/apply-job.use-case';
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
@@ -17,7 +18,7 @@ import { JobController } from './http/job.controller';
 
 @Module({
   controllers: [JobController],
-  imports: [CandidateModule],
+  imports: [CandidateModule, forwardRef(() => SubscriptionModule)],
   providers: [
     {
       provide: JobRepository,
