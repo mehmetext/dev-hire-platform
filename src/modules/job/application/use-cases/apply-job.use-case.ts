@@ -2,7 +2,14 @@ import { Inject } from '@nestjs/common';
 import { CandidateRepository } from 'src/modules/candidate/application/repositories/candidate.repository';
 import { EmailQueueRepository } from 'src/shared/modules/queue/application/repositories/email-queue.repository';
 import { WebhookDispatchRepository } from 'src/shared/modules/queue/application/repositories/webhook-queue.repository';
-import { CandidateCVNotFoundError } from '../../domain/errors';
+import { JobStatus } from '../../domain/enums/job-status.enum';
+import {
+  CandidateCVNotFoundError,
+  JobAlreadyAppliedError,
+  JobExpiredError,
+  JobNotActiveError,
+  JobNotFoundError,
+} from '../../domain/errors';
 import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { JobRepository } from '../repositories/job.repository';
 
@@ -27,7 +34,28 @@ export class ApplyJobUseCase {
       throw new CandidateCVNotFoundError();
     }
 
-    await this.jobRepository.apply(command);
+    const job = await this.jobRepository.findById(command.jobId);
+
+    if (!job) {
+      throw new JobNotFoundError();
+    }
+
+    if (job.status !== JobStatus.ACTIVE) {
+      throw new JobNotActiveError();
+    }
+
+    if (job.expiresAt && job.expiresAt < new Date()) {
+      throw new JobExpiredError();
+    }
+
+    const existingApplication =
+      await this.jobRepository.findApplicationByJobIdAndCandidateProfileId(
+        command.jobId,
+        command.candidateProfileId,
+      );
+    if (existingApplication) {
+      throw new JobAlreadyAppliedError();
+    }
 
     await this.emailQueueRepository.sendApplicationEmail({
       jobId: command.jobId,

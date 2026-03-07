@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JobApplication } from '../../domain/entities/job-application.entity';
 import { Job } from '../../domain/entities/job.entity';
-import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { CreateJobCommand } from '../dtos/create-job.command';
 import { GetJobsCommand } from '../dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../dtos/get-owned-job-applications.command';
@@ -11,7 +10,11 @@ import { WithdrawJobCommand } from '../dtos/withdraw-job.command';
 
 @Injectable()
 export abstract class JobRepository {
-  abstract apply(command: ApplyJobCommand): Promise<void>;
+  abstract addApplication(params: {
+    jobId: string;
+    candidateProfileId: string;
+    candidateCVId: string;
+  }): Promise<void>;
   abstract withdraw(command: WithdrawJobCommand): Promise<void>;
   abstract findApplicationByJobIdAndCandidateProfileId(
     jobId: string,

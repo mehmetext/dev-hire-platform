@@ -5,7 +5,6 @@ import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
-import { ApplyJobCommand } from '../../application/dtos/apply-job.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../../application/dtos/get-owned-job-applications.command';
@@ -16,48 +15,23 @@ import { JobRepository } from '../../application/repositories/job.repository';
 import { JobApplication } from '../../domain/entities/job-application.entity';
 import { Job } from '../../domain/entities/job.entity';
 import { JobStatus } from '../../domain/enums/job-status.enum';
-import {
-  JobAlreadyAppliedError,
-  JobExpiredError,
-  JobNotActiveError,
-  JobNotFoundError,
-} from '../../domain/errors';
+import { JobNotFoundError } from '../../domain/errors';
 import { PrismaJobMapper } from './prisma-job.mapper';
 
 @Injectable()
 export class PrismaJobRepository implements JobRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async apply(command: ApplyJobCommand): Promise<void> {
-    const job = await this.findById(command.jobId);
-
-    if (!job) {
-      throw new JobNotFoundError();
-    }
-
-    if (job.status !== JobStatus.ACTIVE) {
-      throw new JobNotActiveError();
-    }
-
-    if (job.expiresAt && job.expiresAt < new Date()) {
-      throw new JobExpiredError();
-    }
-
-    const jobApplication =
-      await this.findApplicationByJobIdAndCandidateProfileId(
-        command.jobId,
-        command.candidateProfileId,
-      );
-
-    if (jobApplication) {
-      throw new JobAlreadyAppliedError();
-    }
-
+  async addApplication(params: {
+    jobId: string;
+    candidateProfileId: string;
+    candidateCVId: string;
+  }): Promise<void> {
     await this.prisma.jobApplication.create({
       data: {
-        jobId: command.jobId,
-        candidateProfileId: command.candidateProfileId,
-        candidateCVId: command.candidateCVId,
+        jobId: params.jobId,
+        candidateProfileId: params.candidateProfileId,
+        candidateCVId: params.candidateCVId,
       },
     });
   }
