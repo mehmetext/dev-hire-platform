@@ -4,11 +4,15 @@ import { SubscriptionModule } from 'src/modules/subscription/infra/subscription.
 import { QueueModule } from 'src/shared/modules/queue/infra/queue.module';
 import { JobRepository } from '../application/repositories/job.repository';
 import { ApplyJobUseCase } from '../application/use-cases/apply-job.use-case';
+import { BulkAddJobQuestionsUseCase } from '../application/use-cases/bulk-add-job-questions.use-case';
+import { BulkDeleteJobQuestionsUseCase } from '../application/use-cases/bulk-delete-job-questions.use-case';
+import { BulkUpdateJobQuestionsUseCase } from '../application/use-cases/bulk-update-job-questions.use-case';
 import { CloseExpiredJobsUseCase } from '../application/use-cases/close-expired-jobs.use-case';
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobDetailsByIdUseCase } from '../application/use-cases/get-job-details-by-id.use-case';
+import { GetJobQuestionsByJobIdUseCase } from '../application/use-cases/get-job-questions-by-job-id.use-case';
 import { GetJobsUseCase } from '../application/use-cases/get-jobs.use-case';
 import { GetOwnedJobApplicationsUseCase } from '../application/use-cases/get-owned-job-applications.use-case';
 import { GetOwnedJobsUseCase } from '../application/use-cases/get-owned-jobs.use-case';
@@ -40,6 +44,10 @@ import { CloseExpiredJobsCron } from './scheduler/close-expired-jobs.cron';
     UpdateJobApplicationStatusByCompanyUseCase,
     GetOwnedJobApplicationsUseCase,
     GetJobDetailsByIdUseCase,
+    GetJobQuestionsByJobIdUseCase,
+    BulkAddJobQuestionsUseCase,
+    BulkUpdateJobQuestionsUseCase,
+    BulkDeleteJobQuestionsUseCase,
   ],
   exports: [JobRepository],
 })

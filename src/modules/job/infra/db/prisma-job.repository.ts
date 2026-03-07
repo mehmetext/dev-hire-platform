@@ -5,7 +5,9 @@ import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
+import { BulkUpdateJobQuestionItemCommand } from '../../application/dtos/bulk-update-job-questions.command';
 import { CreateJobCommand } from '../../application/dtos/create-job.command';
+import { CreateJobQuestionCommand } from '../../application/dtos/create-job-question.command';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../../application/dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
@@ -219,7 +221,9 @@ export class PrismaJobRepository implements JobRepository {
     const job = await this.prisma.job.findUnique({
       where: { id },
       include: {
-        jobQuestions: params?.includeJobQuestions ? true : false,
+        jobQuestions: params?.includeJobQuestions
+          ? { where: { deletedAt: null } }
+          : false,
       },
     });
     if (!job) return null;
@@ -399,6 +403,78 @@ export class PrismaJobRepository implements JobRepository {
     await this.prisma.job.updateMany({
       where: { expiresAt: { lt: new Date() } },
       data: { status: JobStatus.INACTIVE },
+    });
+  }
+
+  async addQuestions(
+    jobId: string,
+    questions: CreateJobQuestionCommand[],
+  ): Promise<JobQuestion[]> {
+    const created = await this.prisma.jobQuestion.createManyAndReturn({
+      data: questions.map((q) => ({
+        jobId,
+        question: q.question,
+        questionType: q.questionType,
+        isRequired: q.isRequired,
+        sortOrder: q.sortOrder,
+      })),
+    });
+    return created.map((q) =>
+      JobQuestion.create({
+        id: q.id,
+        jobId: q.jobId,
+        question: q.question,
+        questionType: q.questionType,
+        isRequired: q.isRequired,
+        sortOrder: q.sortOrder,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt,
+        deletedAt: q.deletedAt ?? undefined,
+      }),
+    );
+  }
+
+  async updateQuestions(
+    jobId: string,
+    updates: BulkUpdateJobQuestionItemCommand[],
+  ): Promise<JobQuestion[]> {
+    await this.prisma.$transaction(
+      updates.map((item) => {
+        const data: Prisma.JobQuestionUncheckedUpdateInput = {};
+        if (item.question !== undefined) data.question = item.question;
+        if (item.questionType !== undefined)
+          data.questionType = item.questionType;
+        if (item.isRequired !== undefined) data.isRequired = item.isRequired;
+        if (item.sortOrder !== undefined) data.sortOrder = item.sortOrder;
+        return this.prisma.jobQuestion.updateMany({
+          where: { id: item.id, jobId },
+          data,
+        });
+      }),
+    );
+    const ids = updates.map((u) => u.id);
+    const rows = await this.prisma.jobQuestion.findMany({
+      where: { id: { in: ids }, jobId, deletedAt: null },
+    });
+    return rows.map((row) =>
+      JobQuestion.create({
+        id: row.id,
+        jobId: row.jobId,
+        question: row.question,
+        questionType: row.questionType,
+        isRequired: row.isRequired,
+        sortOrder: row.sortOrder,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        deletedAt: row.deletedAt ?? undefined,
+      }),
+    );
+  }
+
+  async deleteQuestions(jobId: string, questionIds: string[]): Promise<void> {
+    await this.prisma.jobQuestion.updateMany({
+      where: { id: { in: questionIds }, jobId },
+      data: { deletedAt: new Date() },
     });
   }
 }

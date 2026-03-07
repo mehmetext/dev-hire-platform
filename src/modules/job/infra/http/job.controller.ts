@@ -21,10 +21,14 @@ import { RequireCandidateProfileGuard } from 'src/shared/guards/require-candidat
 import { RequireCompanyProfileGuard } from 'src/shared/guards/require-company-profile.guard';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
+import { BulkAddJobQuestionsUseCase } from '../../application/use-cases/bulk-add-job-questions.use-case';
+import { BulkDeleteJobQuestionsUseCase } from '../../application/use-cases/bulk-delete-job-questions.use-case';
+import { BulkUpdateJobQuestionsUseCase } from '../../application/use-cases/bulk-update-job-questions.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobDetailsByIdUseCase } from '../../application/use-cases/get-job-details-by-id.use-case';
+import { GetJobQuestionsByJobIdUseCase } from '../../application/use-cases/get-job-questions-by-job-id.use-case';
 import { GetJobsUseCase } from '../../application/use-cases/get-jobs.use-case';
 import { GetOwnedJobApplicationsUseCase } from '../../application/use-cases/get-owned-job-applications.use-case';
 import { GetOwnedJobsUseCase } from '../../application/use-cases/get-owned-jobs.use-case';
@@ -44,6 +48,10 @@ import {
 } from '../dtos/job-response.dto';
 import { UpdateJobApplicationStatusByCompanyDto } from '../dtos/update-job-application-status-by-company.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
+import { BulkAddJobQuestionsDto } from '../dtos/bulk-add-job-questions.dto';
+import { BulkUpdateJobQuestionsDto } from '../dtos/bulk-update-job-questions.dto';
+import { BulkDeleteJobQuestionsDto } from '../dtos/bulk-delete-job-questions.dto';
+import { JobQuestionResponseDto } from '../dtos/job-question-response.dto';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
 
 @Controller('jobs')
@@ -71,6 +79,14 @@ export class JobController {
     private readonly updateJobApplicationStatusByCompanyUseCase: UpdateJobApplicationStatusByCompanyUseCase,
     @Inject(GetOwnedJobApplicationsUseCase)
     private readonly getOwnedJobApplicationsUseCase: GetOwnedJobApplicationsUseCase,
+    @Inject(BulkAddJobQuestionsUseCase)
+    private readonly bulkAddJobQuestionsUseCase: BulkAddJobQuestionsUseCase,
+    @Inject(BulkUpdateJobQuestionsUseCase)
+    private readonly bulkUpdateJobQuestionsUseCase: BulkUpdateJobQuestionsUseCase,
+    @Inject(BulkDeleteJobQuestionsUseCase)
+    private readonly bulkDeleteJobQuestionsUseCase: BulkDeleteJobQuestionsUseCase,
+    @Inject(GetJobQuestionsByJobIdUseCase)
+    private readonly getJobQuestionsByJobIdUseCase: GetJobQuestionsByJobIdUseCase,
   ) {}
 
   @Post()
@@ -168,6 +184,109 @@ export class JobController {
     @Req() req: Request & { user: UserResponseDto },
   ) {
     return this.deleteJobUseCase.execute(id, req.user.companyProfile!.id);
+  }
+
+  @Get(':id/questions')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
+  @ApiOkResponseGeneric(JobQuestionResponseDto, { isArray: true })
+  async getJobQuestions(
+    @Param('id') id: string,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    const questions = await this.getJobQuestionsByJobIdUseCase.execute(
+      id,
+      req.user.companyProfile!.id,
+    );
+    return questions.map((q) => ({
+      id: q.id,
+      question: q.question,
+      questionType: q.questionType,
+      isRequired: q.isRequired,
+      sortOrder: q.sortOrder,
+      createdAt: q.createdAt,
+      updatedAt: q.updatedAt,
+      deletedAt: q.deletedAt,
+    }));
+  }
+
+  @Post(':id/questions')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
+  @ApiCreatedResponseGeneric(JobQuestionResponseDto, { isArray: true })
+  async bulkAddJobQuestions(
+    @Param('id') id: string,
+    @Body() dto: BulkAddJobQuestionsDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    const questions = await this.bulkAddJobQuestionsUseCase.execute({
+      jobId: id,
+      companyProfileId: req.user.companyProfile!.id,
+      questions: dto.questions.map((q) => ({
+        question: q.question,
+        questionType: q.questionType,
+        isRequired: q.isRequired,
+        sortOrder: q.sortOrder,
+      })),
+    });
+    return questions.map((q) => ({
+      id: q.id,
+      question: q.question,
+      questionType: q.questionType,
+      isRequired: q.isRequired,
+      sortOrder: q.sortOrder,
+      createdAt: q.createdAt,
+      updatedAt: q.updatedAt,
+      deletedAt: q.deletedAt,
+    }));
+  }
+
+  @Put(':id/questions')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
+  @ApiOkResponseGeneric(JobQuestionResponseDto, { isArray: true })
+  async bulkUpdateJobQuestions(
+    @Param('id') id: string,
+    @Body() dto: BulkUpdateJobQuestionsDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    const questions = await this.bulkUpdateJobQuestionsUseCase.execute({
+      jobId: id,
+      companyProfileId: req.user.companyProfile!.id,
+      questions: dto.questions.map((q) => ({
+        id: q.id,
+        question: q.question,
+        questionType: q.questionType,
+        isRequired: q.isRequired,
+        sortOrder: q.sortOrder,
+      })),
+    });
+    return questions.map((q) => ({
+      id: q.id,
+      question: q.question,
+      questionType: q.questionType,
+      isRequired: q.isRequired,
+      sortOrder: q.sortOrder,
+      createdAt: q.createdAt,
+      updatedAt: q.updatedAt,
+      deletedAt: q.deletedAt,
+    }));
+  }
+
+  @Delete(':id/questions')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RequireCompanyProfileGuard)
+  @ApiNoContentResponse()
+  bulkDeleteJobQuestions(
+    @Param('id') id: string,
+    @Body() dto: BulkDeleteJobQuestionsDto,
+    @Req() req: Request & { user: UserResponseDto },
+  ) {
+    return this.bulkDeleteJobQuestionsUseCase.execute({
+      jobId: id,
+      companyProfileId: req.user.companyProfile!.id,
+      questionIds: dto.questionIds,
+    });
   }
 
   @Get(':id/applications')
