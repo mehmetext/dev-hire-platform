@@ -83,4 +83,18 @@ export class PrismaCompanyWebhookRepository implements CompanyWebhookRepository 
       data: { deletedAt: new Date() },
     });
   }
+
+  async findByWebhookIdAndCompanyProfileId(
+    webhookId: string,
+    companyProfileId: string,
+  ): Promise<CompanyWebhook | null> {
+    const row = await this.prisma.companyWebhook.findUnique({
+      where: { companyProfileId_webhookId: { companyProfileId, webhookId } },
+      include: { webhook: true },
+    });
+    if (!row) {
+      return null;
+    }
+    return PrismaCompanyWebhookMapper.toDomain(row);
+  }
 }

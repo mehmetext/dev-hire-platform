@@ -14,4 +14,8 @@ export abstract class CompanyWebhookRepository {
     webhookId: string,
     companyProfileId: string,
   ): Promise<void>;
+  abstract findByWebhookIdAndCompanyProfileId(
+    webhookId: string,
+    companyProfileId: string,
+  ): Promise<CompanyWebhook | null>;
 }

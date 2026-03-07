@@ -1,6 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { CandidateRepository } from 'src/modules/candidate/application/repositories/candidate.repository';
 import { EmailQueueRepository } from 'src/shared/modules/queue/application/repositories/email-queue.repository';
+import { WebhookDispatchRepository } from 'src/shared/modules/queue/application/repositories/webhook-queue.repository';
 import { CandidateCVNotFoundError } from '../../domain/errors';
 import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { JobRepository } from '../repositories/job.repository';
@@ -13,6 +14,8 @@ export class ApplyJobUseCase {
     private readonly candidateRepository: CandidateRepository,
     @Inject(EmailQueueRepository)
     private readonly emailQueueRepository: EmailQueueRepository,
+    @Inject(WebhookDispatchRepository)
+    private readonly webhookQueueRepository: WebhookDispatchRepository,
   ) {}
 
   async execute(command: ApplyJobCommand): Promise<void> {
@@ -30,6 +33,12 @@ export class ApplyJobUseCase {
       jobId: command.jobId,
       candidateProfileId: command.candidateProfileId,
       candidateCVUrl: candidateCV.url,
+    });
+
+    await this.webhookQueueRepository.dispatchNewApplicationWebhook({
+      candidateProfileId: command.candidateProfileId,
+      candidateCVId: command.candidateCVId,
+      jobId: command.jobId,
     });
   }
 }
