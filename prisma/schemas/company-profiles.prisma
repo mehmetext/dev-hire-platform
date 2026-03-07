@@ -24,10 +24,7 @@ model CompanyProfile {
 }
 
 enum CompanyWebhookEventType {
-  JOB_APPLICATION_CREATED
-  JOB_APPLICATION_UPDATED
-  JOB_APPLICATION_DELETED
-  JOB_APPLICATION_STATUS_CHANGED
+  NEW_JOB_APPLICATION
 }
 
 model CompanyWebhook {
