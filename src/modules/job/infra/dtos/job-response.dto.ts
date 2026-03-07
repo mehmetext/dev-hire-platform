@@ -2,6 +2,7 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { CompanyResponseDto } from 'src/modules/company/infra/dtos/company-response.dto';
 import { JobStatus } from '../../domain/enums/job-status.enum';
 import { WorkType } from '../../domain/enums/work-type.enum';
+import { JobQuestionResponseDto } from './job-question-response.dto';
 
 export class JobResponseDto {
   @ApiProperty({
@@ -83,6 +84,12 @@ export class JobResponseDto {
     example: CompanyResponseDto,
   })
   companyProfile?: CompanyResponseDto;
+
+  @ApiProperty({
+    description: 'The job questions of the job',
+    type: () => [JobQuestionResponseDto],
+  })
+  jobQuestions?: JobQuestionResponseDto[];
 }
 
 export class JobResponseWithoutCompanyDto extends OmitType(JobResponseDto, [

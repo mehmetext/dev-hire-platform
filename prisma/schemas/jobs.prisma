@@ -82,6 +82,10 @@ model JobQuestion {
   sortOrder          Int                  @default(0) @map("sort_order")
   jobQuestionAnswers JobQuestionAnswers[]
 
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
   @@map("job_questions")
 }
 
@@ -94,6 +98,10 @@ model JobQuestionAnswers {
   jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id])
 
   answer String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@unique([jobQuestionId, jobApplicationId])
   @@map("job_question_answers")

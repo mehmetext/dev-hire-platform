@@ -26,7 +26,10 @@ export abstract class JobRepository {
   ): Promise<JobApplication[]>;
   abstract create(command: CreateJobCommand): Promise<Job>;
   abstract findAll(command: GetJobsCommand): Promise<Job[]>;
-  abstract findById(id: string): Promise<Job | null>;
+  abstract findById(
+    id: string,
+    params?: { includeJobQuestions?: boolean },
+  ): Promise<Job | null>;
   abstract findAllByCompanyId(companyId: string): Promise<Job[]>;
   abstract update(command: UpdateJobCommand): Promise<Job>;
   abstract delete(id: string): Promise<void>;

@@ -184,9 +184,15 @@ export class PrismaJobRepository implements JobRepository {
 
     return PrismaJobMapper.toDomain(created);
   }
-  async findById(id: string): Promise<Job | null> {
+  async findById(
+    id: string,
+    params?: { includeJobQuestions?: boolean },
+  ): Promise<Job | null> {
     const job = await this.prisma.job.findUnique({
       where: { id },
+      include: {
+        jobQuestions: params?.includeJobQuestions ? true : false,
+      },
     });
     if (!job) return null;
 

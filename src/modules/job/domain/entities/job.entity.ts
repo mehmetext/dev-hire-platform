@@ -6,6 +6,7 @@ import {
   JobNotActiveError,
   JobNotAllowedError,
 } from '../errors';
+import { JobQuestion } from './job-question.entity';
 
 export class Job {
   constructor(
@@ -22,6 +23,7 @@ export class Job {
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | undefined,
     public readonly companyProfile?: CompanyProfile,
+    public readonly jobQuestions?: JobQuestion[],
   ) {}
 
   isDeleted(): boolean {
@@ -42,6 +44,7 @@ export class Job {
     updatedAt?: Date;
     deletedAt?: Date | undefined;
     companyProfile?: CompanyProfile;
+    jobQuestions?: JobQuestion[];
   }): Job {
     return new Job(
       params.id,
@@ -57,6 +60,9 @@ export class Job {
       params.updatedAt ?? new Date(),
       params.deletedAt ?? undefined,
       params.companyProfile ?? undefined,
+      params.jobQuestions?.map((jobQuestion) =>
+        JobQuestion.create(jobQuestion),
+      ),
     );
   }
 

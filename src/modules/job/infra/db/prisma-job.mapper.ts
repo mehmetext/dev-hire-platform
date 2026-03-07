@@ -2,13 +2,18 @@ import {
   Prisma,
   CompanyProfile as PrismaCompanyProfile,
   Job as PrismaJob,
+  JobQuestion as PrismaJobQuestion,
 } from 'src/generated/prisma/client';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
+import { JobQuestion } from '../../domain/entities/job-question.entity';
 import { Job } from '../../domain/entities/job.entity';
 
 export class PrismaJobMapper {
   static toDomain(
-    job: PrismaJob & { companyProfile?: PrismaCompanyProfile },
+    job: PrismaJob & {
+      companyProfile?: PrismaCompanyProfile;
+      jobQuestions?: PrismaJobQuestion[];
+    },
   ): Job {
     return new Job(
       job.id,
@@ -35,6 +40,19 @@ export class PrismaJobMapper {
             deletedAt: job.companyProfile.deletedAt ?? undefined,
           })
         : undefined,
+      job.jobQuestions?.map((jobQuestion) =>
+        JobQuestion.create({
+          id: jobQuestion.id,
+          jobId: jobQuestion.jobId,
+          question: jobQuestion.question,
+          questionType: jobQuestion.questionType,
+          isRequired: jobQuestion.isRequired,
+          sortOrder: jobQuestion.sortOrder,
+          createdAt: jobQuestion.createdAt,
+          updatedAt: jobQuestion.updatedAt,
+          deletedAt: jobQuestion.deletedAt ?? undefined,
+        }),
+      ),
     );
   }
 
