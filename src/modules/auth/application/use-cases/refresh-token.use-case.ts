@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { UserRepository } from 'src/modules/user/application/repositories/user.repository';
 import { UserNotFoundError } from 'src/modules/user/domain/errors';
 import { InvalidTokenError } from '../../domain/errors';
+import { AuthConfig } from '../auth.config';
 import { LoginResult } from '../dtos/login.result';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
@@ -15,9 +15,10 @@ export class RefreshTokenUseCase {
     private readonly tokenGenerator: TokenGeneratorRepository,
     @Inject(RefreshTokenRepository)
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    private readonly configService: ConfigService,
     @Inject(UserRepository) private readonly userRepository: UserRepository,
     @Inject(LoginUseCase) private readonly loginUseCase: LoginUseCase,
+    @Inject(AuthConfig)
+    private readonly authConfig: AuthConfig,
   ) {}
 
   async execute(oldRefreshToken: string): Promise<LoginResult> {
@@ -25,7 +26,7 @@ export class RefreshTokenUseCase {
 
     try {
       payload = await this.tokenGenerator.verifyToken(oldRefreshToken, {
-        secret: this.configService.getOrThrow<string>('REFRESH_TOKEN_SECRET'),
+        secret: this.authConfig.getRefreshTokenSecret(),
       });
     } catch {
       throw new InvalidTokenError();
