@@ -8,7 +8,10 @@ export abstract class UserRepository {
     command: CreateUserCommand,
     options?: { tx?: TransactionContext },
   ): Promise<User>;
-  abstract findByEmail(email: EmailVO): Promise<User | null>;
+  abstract findByEmail(
+    email: EmailVO,
+    options?: { tx?: TransactionContext },
+  ): Promise<User | null>;
   abstract findById(id: string): Promise<User | null>;
   abstract update(user: User): Promise<User>;
   abstract delete(id: string): Promise<void>;

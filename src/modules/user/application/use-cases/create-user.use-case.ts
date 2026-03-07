@@ -7,6 +7,7 @@ import { CompanyProfile } from 'src/modules/company/domain/entities/company-prof
 import { SubscriptionPlan } from 'src/modules/company/domain/enums/subscription-plan.enum';
 import { UnitOfWorkRepository } from 'src/shared/modules/unit-of-work/application/repositories/unit-of-work.repository';
 import { User } from '../../domain/entities/user.entity';
+import { UserAlreadyExistsError } from '../../domain/errors';
 import { CreateUserCommand } from '../dtos/create-user.command';
 import { UserRepository } from '../repositories/user.repository';
 
@@ -24,6 +25,15 @@ export class CreateUserUseCase {
 
   async execute(command: CreateUserCommand): Promise<User> {
     return this.unitOfWorkRepository.execute(async (tx) => {
+      const existingUser = await this.userRepository.findByEmail(
+        command.email,
+        { tx },
+      );
+
+      if (existingUser) {
+        throw new UserAlreadyExistsError();
+      }
+
       const user = await this.userRepository.create(command, {
         tx,
       });

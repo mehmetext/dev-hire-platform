@@ -5,7 +5,7 @@ import { TransactionContext } from 'src/shared/modules/unit-of-work/application/
 import { CreateUserCommand } from '../../application/dtos/create-user.command';
 import { UserRepository } from '../../application/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
-import { UserAlreadyExistsError, UserNotFoundError } from '../../domain/errors';
+import { UserNotFoundError } from '../../domain/errors';
 import { EmailVO } from '../../domain/value-objects/email.vo';
 import { PrismaUserMapper } from './prisma-user.mapper';
 
@@ -18,12 +18,6 @@ export class PrismaUserRepository implements UserRepository {
     options?: { tx?: TransactionContext },
   ): Promise<User> {
     const client = (options?.tx ?? this.prisma) as PrismaService;
-
-    const existingUser = await this.findByEmail(command.email);
-
-    if (existingUser) {
-      throw new UserAlreadyExistsError();
-    }
 
     const hashedPassword = await bcrypt.hash(command.password, 10);
 
@@ -40,8 +34,13 @@ export class PrismaUserRepository implements UserRepository {
     });
   }
 
-  async findByEmail(email: EmailVO): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
+  async findByEmail(
+    email: EmailVO,
+    options?: { tx?: TransactionContext },
+  ): Promise<User | null> {
+    const client = (options?.tx ?? this.prisma) as PrismaService;
+
+    const user = await client.user.findUnique({
       where: { email: email.value },
       include: {
         companyProfile: true,
