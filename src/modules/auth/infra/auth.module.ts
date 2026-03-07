@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from 'src/modules/user/infra/user.module';
+import { AuthConfig } from '../application/auth.config';
 import { RefreshTokenRepository } from '../application/repositories/refresh-token.repository';
 import { TokenGeneratorRepository } from '../application/repositories/token-generator.repository';
 import { LoginUseCase } from '../application/use-cases/login.use-case';
@@ -9,6 +10,7 @@ import { LogoutUseCase } from '../application/use-cases/logout.use-case';
 import { RefreshTokenUseCase } from '../application/use-cases/refresh-token.use-case';
 import { RegisterUseCase } from '../application/use-cases/register.use-case';
 import { ValidateUserUseCase } from '../application/use-cases/validate-user.use-case';
+import { NestAuthConfig } from './config/nest-auth.config';
 import { AuthController } from './http/auth.controller';
 import { JwtTokenGeneratorRepository } from './jwt/jwt-token-generator.repository';
 import { RedisRefreshTokenRepository } from './refresh-token/redis-refresh-token.repository';
@@ -19,6 +21,10 @@ import { LocalStrategy } from './strategies/local.strategy';
   controllers: [AuthController],
   imports: [UserModule, PassportModule, JwtModule],
   providers: [
+    {
+      provide: AuthConfig,
+      useClass: NestAuthConfig,
+    },
     LogoutUseCase,
     RefreshTokenUseCase,
     ValidateUserUseCase,

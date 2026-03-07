@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { User } from 'src/modules/user/domain/entities/user.entity';
+import { AuthConfig } from '../auth.config';
 import { LoginResult } from '../dtos/login.result';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { TokenGeneratorRepository } from '../repositories/token-generator.repository';
@@ -10,7 +10,8 @@ export class LoginUseCase {
   constructor(
     @Inject(TokenGeneratorRepository)
     private readonly tokenGenerator: TokenGeneratorRepository,
-    private readonly configService: ConfigService,
+    @Inject(AuthConfig)
+    private readonly authConfig: AuthConfig,
     @Inject(RefreshTokenRepository)
     private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
@@ -19,21 +20,17 @@ export class LoginUseCase {
     const jti = crypto.randomUUID();
     const payload = { sub: user.id, jti };
 
-    const isDevelopment =
-      this.configService.get<string>('NODE_ENV') === 'development';
-
-    const accessTokenExpiresIn = isDevelopment ? '15d' : '15m';
-    const accessTokenExpiresInSeconds = isDevelopment
-      ? 15 * 24 * 60 * 60
-      : 15 * 60;
+    const accessTokenExpiresIn = this.authConfig.getAccessTokenExpiresIn();
+    const accessTokenExpiresInSeconds =
+      this.authConfig.getAccessTokenExpiresInSeconds();
 
     const accessToken = await this.tokenGenerator.generateToken(payload, {
       expiresIn: accessTokenExpiresIn,
-      secret: this.configService.getOrThrow<string>('ACCESS_TOKEN_SECRET'),
+      secret: this.authConfig.getAccessTokenSecret(),
     });
     const refreshToken = await this.tokenGenerator.generateToken(payload, {
-      expiresIn: '7d',
-      secret: this.configService.getOrThrow<string>('REFRESH_TOKEN_SECRET'),
+      expiresIn: this.authConfig.getRefreshTokenExpiresIn(),
+      secret: this.authConfig.getRefreshTokenSecret(),
     });
 
     await this.refreshTokenRepository.save(
