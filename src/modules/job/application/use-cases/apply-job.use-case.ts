@@ -46,11 +46,9 @@ export class ApplyJobUseCase {
       throw new JobAlreadyAppliedError();
     }
 
-    await this.jobRepository.addApplication({
-      jobId: command.jobId,
-      candidateProfileId: command.candidateProfileId,
-      candidateCVId: command.candidateCVId,
-    });
+    // job questions check
+
+    await this.jobRepository.addApplication(command);
 
     await this.emailQueueRepository.sendApplicationEmail({
       jobId: command.jobId,

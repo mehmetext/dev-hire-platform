@@ -22,6 +22,9 @@ export class WithdrawJobUseCase {
 
     jobApplication.assertCanWithdraw();
 
+    await this.jobRepository.deleteQuestionAnswersByJobApplicationId(
+      jobApplication.id,
+    );
     await this.jobRepository.withdraw(command);
   }
 }

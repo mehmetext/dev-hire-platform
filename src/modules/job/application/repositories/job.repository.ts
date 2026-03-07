@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { JobApplication } from '../../domain/entities/job-application.entity';
 import { JobQuestion } from '../../domain/entities/job-question.entity';
 import { Job } from '../../domain/entities/job.entity';
-import { CreateJobCommand } from '../dtos/create-job.command';
+import { BulkUpdateJobQuestionItemCommand } from '../dtos/bulk-update-job-questions.command';
+import { CreateJobQuestionAnswerCommand } from '../dtos/create-job-question-answer.command';
 import { CreateJobQuestionCommand } from '../dtos/create-job-question.command';
+import { CreateJobCommand } from '../dtos/create-job.command';
 import { GetJobsCommand } from '../dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../dtos/update-job-application-status-by-company.command';
-import { BulkUpdateJobQuestionItemCommand } from '../dtos/bulk-update-job-questions.command';
 import { UpdateJobCommand } from '../dtos/update-job.command';
 import { WithdrawJobCommand } from '../dtos/withdraw-job.command';
 
@@ -17,6 +18,7 @@ export abstract class JobRepository {
     jobId: string;
     candidateProfileId: string;
     candidateCVId: string;
+    jobQuestionAnswers: CreateJobQuestionAnswerCommand[];
   }): Promise<void>;
   abstract withdraw(command: WithdrawJobCommand): Promise<void>;
   abstract findApplicationByJobIdAndCandidateProfileId(
@@ -54,4 +56,7 @@ export abstract class JobRepository {
     updates: BulkUpdateJobQuestionItemCommand[],
   ): Promise<JobQuestion[]>;
   abstract deleteQuestions(jobId: string, questionIds: string[]): Promise<void>;
+  abstract deleteQuestionAnswersByJobApplicationId(
+    jobApplicationId: string,
+  ): Promise<void>;
 }

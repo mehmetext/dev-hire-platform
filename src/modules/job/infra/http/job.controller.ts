@@ -36,22 +36,22 @@ import { UpdateJobApplicationStatusByCompanyUseCase } from '../../application/us
 import { UpdateJobUseCase } from '../../application/use-cases/update-job.use-case';
 import { WithdrawJobUseCase } from '../../application/use-cases/withdraw-job.use-case';
 import { ApplyJobDto } from '../dtos/apply-job.dto';
+import { BulkAddJobQuestionsDto } from '../dtos/bulk-add-job-questions.dto';
+import { BulkDeleteJobQuestionsDto } from '../dtos/bulk-delete-job-questions.dto';
+import { BulkUpdateJobQuestionsDto } from '../dtos/bulk-update-job-questions.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { GetJobsQueryDto } from '../dtos/get-jobs-query.dto';
 import {
   JobApplicationResponseWithoutCandidateDto,
   JobApplicationResponseWithoutJobDto,
 } from '../dtos/job-application-response.dto';
+import { JobQuestionResponseDto } from '../dtos/job-question-response.dto';
 import {
   JobResponseDto,
   JobResponseWithoutCompanyDto,
 } from '../dtos/job-response.dto';
 import { UpdateJobApplicationStatusByCompanyDto } from '../dtos/update-job-application-status-by-company.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
-import { BulkAddJobQuestionsDto } from '../dtos/bulk-add-job-questions.dto';
-import { BulkUpdateJobQuestionsDto } from '../dtos/bulk-update-job-questions.dto';
-import { BulkDeleteJobQuestionsDto } from '../dtos/bulk-delete-job-questions.dto';
-import { JobQuestionResponseDto } from '../dtos/job-question-response.dto';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
 
 @Controller('jobs')
@@ -116,6 +116,7 @@ export class JobController {
       jobId: id,
       candidateProfileId: req.user.candidateProfile!.id,
       candidateCVId: applyJobDto.candidateCVId,
+      jobQuestionAnswers: applyJobDto.jobQuestionAnswers,
     });
   }
 

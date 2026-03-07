@@ -6,8 +6,9 @@ import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidat
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 import { BulkUpdateJobQuestionItemCommand } from '../../application/dtos/bulk-update-job-questions.command';
-import { CreateJobCommand } from '../../application/dtos/create-job.command';
+import { CreateJobQuestionAnswerCommand } from '../../application/dtos/create-job-question-answer.command';
 import { CreateJobQuestionCommand } from '../../application/dtos/create-job-question.command';
+import { CreateJobCommand } from '../../application/dtos/create-job.command';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { GetOwnedJobApplicationsCommand } from '../../application/dtos/get-owned-job-applications.command';
 import { UpdateJobApplicationStatusByCompanyCommand } from '../../application/dtos/update-job-application-status-by-company.command';
@@ -29,12 +30,21 @@ export class PrismaJobRepository implements JobRepository {
     jobId: string;
     candidateProfileId: string;
     candidateCVId: string;
+    jobQuestionAnswers: CreateJobQuestionAnswerCommand[];
   }): Promise<void> {
     await this.prisma.jobApplication.create({
       data: {
         jobId: params.jobId,
         candidateProfileId: params.candidateProfileId,
         candidateCVId: params.candidateCVId,
+        jobQuestionAnswers: {
+          createMany: {
+            data: params.jobQuestionAnswers.map((answer) => ({
+              jobQuestionId: answer.jobQuestionId,
+              answer: answer.answer,
+            })),
+          },
+        },
       },
     });
   }
@@ -475,6 +485,14 @@ export class PrismaJobRepository implements JobRepository {
     await this.prisma.jobQuestion.updateMany({
       where: { id: { in: questionIds }, jobId },
       data: { deletedAt: new Date() },
+    });
+  }
+
+  async deleteQuestionAnswersByJobApplicationId(
+    jobApplicationId: string,
+  ): Promise<void> {
+    await this.prisma.jobQuestionAnswers.deleteMany({
+      where: { jobApplicationId },
     });
   }
 }
