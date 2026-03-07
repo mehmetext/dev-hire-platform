@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MailRepository } from '../application/repositories/mail.repository';
+import { SendApplicationEmailUseCase } from '../application/use-cases/send-application-email.use-case';
 import { MockMailRepository } from './mail/mock-mail.repository';
 
 @Module({
@@ -9,6 +10,7 @@ import { MockMailRepository } from './mail/mock-mail.repository';
       provide: MailRepository,
       useClass: MockMailRepository,
     },
+    SendApplicationEmailUseCase,
   ],
   exports: [],
 })
