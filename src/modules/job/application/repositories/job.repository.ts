@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JobApplication } from '../../domain/entities/job-application.entity';
 import { JobQuestion } from '../../domain/entities/job-question.entity';
 import { Job } from '../../domain/entities/job.entity';
+import { ApplicationWithQuestionsAndAnswers } from '../dtos/application-with-questions-and-answers';
 import { BulkUpdateJobQuestionItemCommand } from '../dtos/bulk-update-job-questions.command';
 import { CreateJobQuestionAnswerCommand } from '../dtos/create-job-question-answer.command';
 import { CreateJobQuestionCommand } from '../dtos/create-job-question.command';
@@ -26,6 +27,9 @@ export abstract class JobRepository {
     candidateProfileId: string,
   ): Promise<JobApplication | null>;
   abstract findApplicationById(id: string): Promise<JobApplication | null>;
+  abstract findApplicationByIdWithQuestionsAndAnswers(
+    applicationId: string,
+  ): Promise<ApplicationWithQuestionsAndAnswers | null>;
   abstract findAllJobApplicationsByJobId(
     jobId: string,
   ): Promise<JobApplication[]>;

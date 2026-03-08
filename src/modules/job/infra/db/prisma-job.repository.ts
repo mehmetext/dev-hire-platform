@@ -5,6 +5,7 @@ import { CandidateCV } from 'src/modules/candidate/domain/entities/candidate-cv.
 import { CandidateProfile } from 'src/modules/candidate/domain/entities/candidate-profile.entity';
 import { CompanyProfile } from 'src/modules/company/domain/entities/company-profile.entity';
 import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
+import { ApplicationWithQuestionsAndAnswers } from '../../application/dtos/application-with-questions-and-answers';
 import { BulkUpdateJobQuestionItemCommand } from '../../application/dtos/bulk-update-job-questions.command';
 import { CreateJobQuestionAnswerCommand } from '../../application/dtos/create-job-question-answer.command';
 import { CreateJobQuestionCommand } from '../../application/dtos/create-job-question.command';
@@ -97,6 +98,84 @@ export class PrismaJobRepository implements JobRepository {
       updatedAt: jobApplication.updatedAt,
       deletedAt: jobApplication.deletedAt ?? undefined,
     });
+  }
+
+  async findApplicationByIdWithQuestionsAndAnswers(
+    applicationId: string,
+  ): Promise<ApplicationWithQuestionsAndAnswers | null> {
+    const jobApplication = await this.prisma.jobApplication.findUnique({
+      where: { id: applicationId },
+      include: {
+        job: {
+          include: {
+            companyProfile: true,
+          },
+        },
+        candidateProfile: true,
+        candidateCV: true,
+        jobQuestionAnswers: {
+          include: { jobQuestion: true },
+        },
+      },
+    });
+    if (!jobApplication || !jobApplication.job) return null;
+
+    const questionAnswers = jobApplication.jobQuestionAnswers
+      .map((ja) => ({
+        question: JobQuestion.create({
+          id: ja.jobQuestion.id,
+          jobId: ja.jobQuestion.jobId,
+          question: ja.jobQuestion.question,
+          questionType: ja.jobQuestion.questionType,
+          isRequired: ja.jobQuestion.isRequired,
+          sortOrder: ja.jobQuestion.sortOrder,
+          createdAt: ja.jobQuestion.createdAt,
+          updatedAt: ja.jobQuestion.updatedAt,
+          deletedAt: ja.jobQuestion.deletedAt ?? undefined,
+        }),
+        answer: ja.answer,
+      }))
+      .sort((a, b) => a.question.sortOrder - b.question.sortOrder);
+
+    return {
+      application: JobApplication.create({
+        id: jobApplication.id,
+        jobId: jobApplication.jobId,
+        candidateProfileId: jobApplication.candidateProfileId,
+        candidateCVId: jobApplication.candidateCVId,
+        status: jobApplication.status,
+        createdAt: jobApplication.createdAt,
+        updatedAt: jobApplication.updatedAt,
+        deletedAt: jobApplication.deletedAt ?? undefined,
+        candidateProfile: jobApplication.candidateProfile
+          ? CandidateProfile.create({
+              id: jobApplication.candidateProfile.id,
+              firstName: jobApplication.candidateProfile.firstName,
+              lastName: jobApplication.candidateProfile.lastName,
+              userId: jobApplication.candidateProfile.userId,
+              createdAt: jobApplication.candidateProfile.createdAt,
+              updatedAt: jobApplication.candidateProfile.updatedAt,
+              deletedAt: jobApplication.candidateProfile.deletedAt ?? undefined,
+            })
+          : undefined,
+        candidateCV: jobApplication.candidateCV
+          ? CandidateCV.create({
+              id: jobApplication.candidateCV.id,
+              candidateProfileId: jobApplication.candidateCV.candidateProfileId,
+              title: jobApplication.candidateCV.title ?? undefined,
+              url: jobApplication.candidateCV.url,
+              createdAt: jobApplication.candidateCV.createdAt,
+              updatedAt: jobApplication.candidateCV.updatedAt,
+              deletedAt: jobApplication.candidateCV.deletedAt ?? undefined,
+            })
+          : undefined,
+      }),
+      job: PrismaJobMapper.toDomain({
+        ...jobApplication.job,
+        companyProfile: jobApplication.job.companyProfile ?? undefined,
+      }),
+      questionAnswers,
+    };
   }
 
   async findAll(command: GetJobsCommand): Promise<Job[]> {

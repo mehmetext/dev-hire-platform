@@ -95,3 +95,7 @@ export class JobResponseDto {
 export class JobResponseWithoutCompanyDto extends OmitType(JobResponseDto, [
   'companyProfile',
 ]) {}
+
+export class JobResponseWithoutQuestionsDto extends OmitType(JobResponseDto, [
+  'jobQuestions',
+]) {}

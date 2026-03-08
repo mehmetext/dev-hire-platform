@@ -18,6 +18,7 @@ import { UserResponseDto } from 'src/modules/user/infra/dtos/user-response.dto';
 import { ApiCreatedResponseGeneric } from 'src/shared/decorators/api-created-response-generic.decorator';
 import { ApiOkResponseGeneric } from 'src/shared/decorators/api-ok-response-generic.decorator';
 import { RequireCandidateProfileGuard } from 'src/shared/guards/require-candidate-profile.guard';
+import { RequireCompanyOrCandidateProfileGuard } from 'src/shared/guards/require-company-or-candidate-profile.guard';
 import { RequireCompanyProfileGuard } from 'src/shared/guards/require-company-profile.guard';
 import { GetJobsCommand } from '../../application/dtos/get-jobs.command';
 import { ApplyJobUseCase } from '../../application/use-cases/apply-job.use-case';
@@ -26,6 +27,7 @@ import { BulkDeleteJobQuestionsUseCase } from '../../application/use-cases/bulk-
 import { BulkUpdateJobQuestionsUseCase } from '../../application/use-cases/bulk-update-job-questions.use-case';
 import { CreateJobUseCase } from '../../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../../application/use-cases/delete-job.use-case';
+import { GetApplicationDetailsByIdUseCase } from '../../application/use-cases/get-application-details-by-id.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobDetailsByIdUseCase } from '../../application/use-cases/get-job-details-by-id.use-case';
 import { GetJobQuestionsByJobIdUseCase } from '../../application/use-cases/get-job-questions-by-job-id.use-case';
@@ -41,6 +43,7 @@ import { BulkDeleteJobQuestionsDto } from '../dtos/bulk-delete-job-questions.dto
 import { BulkUpdateJobQuestionsDto } from '../dtos/bulk-update-job-questions.dto';
 import { CreateJobDto } from '../dtos/create-job.dto';
 import { GetJobsQueryDto } from '../dtos/get-jobs-query.dto';
+import { JobApplicationDetailsResponseDto } from '../dtos/job-application-details-response.dto';
 import {
   JobApplicationResponseWithoutCandidateDto,
   JobApplicationResponseWithoutJobDto,
@@ -52,6 +55,7 @@ import {
 } from '../dtos/job-response.dto';
 import { UpdateJobApplicationStatusByCompanyDto } from '../dtos/update-job-application-status-by-company.dto';
 import { UpdateJobDto } from '../dtos/update-job.dto';
+import { JobApplicationDetailsMapper } from '../mappers/job-application-details.mapper';
 import { JobsLimitGuard } from '../guards/jobs-limit.guard';
 
 @Controller('jobs')
@@ -73,6 +77,8 @@ export class JobController {
     private readonly applyJobUseCase: ApplyJobUseCase,
     @Inject(WithdrawJobUseCase)
     private readonly withdrawJobUseCase: WithdrawJobUseCase,
+    @Inject(GetApplicationDetailsByIdUseCase)
+    private readonly getApplicationDetailsByIdUseCase: GetApplicationDetailsByIdUseCase,
     @Inject(GetJobApplicationsByJobIdUseCase)
     private readonly getJobApplicationsByJobIdUseCase: GetJobApplicationsByJobIdUseCase,
     @Inject(UpdateJobApplicationStatusByCompanyUseCase)
@@ -333,5 +339,21 @@ export class JobController {
     return this.getOwnedJobApplicationsUseCase.execute({
       candidateProfileId: req.user.candidateProfile!.id,
     });
+  }
+
+  @Get('applications/:applicationId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RequireCompanyOrCandidateProfileGuard)
+  @ApiOkResponseGeneric(JobApplicationDetailsResponseDto)
+  async getApplicationDetailsById(
+    @Param('applicationId') applicationId: string,
+    @Req() req: Request & { user: UserResponseDto },
+  ): Promise<JobApplicationDetailsResponseDto> {
+    const result = await this.getApplicationDetailsByIdUseCase.execute({
+      applicationId,
+      companyProfileId: req.user.companyProfile?.id,
+      candidateProfileId: req.user.candidateProfile?.id,
+    });
+    return JobApplicationDetailsMapper.toResponseDto(result);
   }
 }

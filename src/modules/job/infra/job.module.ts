@@ -10,6 +10,7 @@ import { BulkUpdateJobQuestionsUseCase } from '../application/use-cases/bulk-upd
 import { CloseExpiredJobsUseCase } from '../application/use-cases/close-expired-jobs.use-case';
 import { CreateJobUseCase } from '../application/use-cases/create-job.use-case';
 import { DeleteJobUseCase } from '../application/use-cases/delete-job.use-case';
+import { GetApplicationDetailsByIdUseCase } from '../application/use-cases/get-application-details-by-id.use-case';
 import { GetJobApplicationsByJobIdUseCase } from '../application/use-cases/get-job-applications-by-job-id-use-case';
 import { GetJobDetailsByIdUseCase } from '../application/use-cases/get-job-details-by-id.use-case';
 import { GetJobQuestionsByJobIdUseCase } from '../application/use-cases/get-job-questions-by-job-id.use-case';
@@ -40,6 +41,7 @@ import { CloseExpiredJobsCron } from './scheduler/close-expired-jobs.cron';
     GetOwnedJobsUseCase,
     ApplyJobUseCase,
     WithdrawJobUseCase,
+    GetApplicationDetailsByIdUseCase,
     GetJobApplicationsByJobIdUseCase,
     UpdateJobApplicationStatusByCompanyUseCase,
     GetOwnedJobApplicationsUseCase,
