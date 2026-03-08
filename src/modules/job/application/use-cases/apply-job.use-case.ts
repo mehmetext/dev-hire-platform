@@ -4,6 +4,7 @@ import { CandidateCVNotFoundError } from 'src/modules/candidate/domain/errors';
 import { EmailQueueRepository } from 'src/shared/modules/queue/application/repositories/email-queue.repository';
 import { WebhookDispatchRepository } from 'src/shared/modules/queue/application/repositories/webhook-queue.repository';
 import { JobAlreadyAppliedError, JobNotFoundError } from '../../domain/errors';
+import { JobApplicationAnswersValidator } from '../../domain/services/job-application-answers.validator';
 import { ApplyJobCommand } from '../dtos/apply-job.command';
 import { JobRepository } from '../repositories/job.repository';
 
@@ -28,7 +29,9 @@ export class ApplyJobUseCase {
       throw new CandidateCVNotFoundError();
     }
 
-    const job = await this.jobRepository.findById(command.jobId);
+    const job = await this.jobRepository.findById(command.jobId, {
+      includeJobQuestions: true,
+    });
 
     if (!job) {
       throw new JobNotFoundError();
@@ -46,7 +49,10 @@ export class ApplyJobUseCase {
       throw new JobAlreadyAppliedError();
     }
 
-    // job questions check
+    JobApplicationAnswersValidator.validate(
+      job.jobQuestions ?? [],
+      command.jobQuestionAnswers,
+    );
 
     await this.jobRepository.addApplication(command);
 

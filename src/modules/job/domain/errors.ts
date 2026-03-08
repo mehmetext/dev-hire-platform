@@ -41,3 +41,20 @@ export class JobApplicationNotPendingError extends DomainError {
     super(message, 'JOB_APPLICATION_NOT_PENDING');
   }
 }
+
+export class MissingRequiredJobQuestionAnswerError extends DomainError {
+  constructor(questionText: string) {
+    super(
+      `Required question has no answer: "${questionText}"`,
+      'MISSING_REQUIRED_JOB_QUESTION_ANSWER',
+    );
+  }
+}
+export class InvalidJobQuestionAnswerError extends DomainError {
+  constructor(questionText: string, reason: string) {
+    super(
+      `Invalid answer for question "${questionText}": ${reason}`,
+      'INVALID_JOB_QUESTION_ANSWER',
+    );
+  }
+}
